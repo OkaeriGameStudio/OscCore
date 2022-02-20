@@ -9,6 +9,13 @@
 	<BaseOutputPath>..\..\bin</BaseOutputPath>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<DocumentationFile>..\..\docs\xml\BuildSoft.OscCore.Runtime.xml</DocumentationFile>
+
+    <PackageId>BuildSoft.OscCore</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>ChanyaKushima</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageDescription>A performance-oriented OSC library for .NET Standard</PackageDescription>
+    <RepositoryUrl>https://github.com/ChanyaVRC/OscCore</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
