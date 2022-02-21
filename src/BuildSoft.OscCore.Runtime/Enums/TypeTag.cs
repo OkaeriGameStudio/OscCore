@@ -7,23 +7,23 @@ namespace BuildSoft.OscCore;
 /// </summary>
 public enum TypeTag : byte
 {
-    False = 70,                     // F, non-standard
-    Infinitum = 73,                 // I, non-standard
-    Nil = 78,                       // N, non-standard
-    AltTypeString = 84,             // S, non-standard
-    True = 85,                      // T, non-standard
-    ArrayStart = 91,                // [, non-standard
-    ArrayEnd = 93,                  // ], non-standard
-    Blob = 98,                      // b, STANDARD
-    AsciiChar32 = 99,               // c, non-standard
-    Float64 = 100,                  // d, non-standard
-    Float32 = 102,                  // f, STANDARD
-    Int64 = 104,                    // h, non-standard
-    Int32 = 105,                    // i, STANDARD
-    MIDI = 109,                     // m, non-standard
-    Color32 = 114,                  // r, non-standard
-    String = 115,                   // s, STANDARD
-    TimeTag = 116                   // t, non-standard
+    False = (byte)'F',                    // F, non-standard
+    Infinitum = (byte)'I',                // I, non-standard
+    Nil = (byte)'N',                      // N, non-standard
+    AltTypeString = (byte)'S',            // S, non-standard
+    True = (byte)'T',                     // T, non-standard
+    ArrayStart = (byte)'[',               // [, non-standard
+    ArrayEnd = (byte)']',                 // ], non-standard
+    Blob = (byte)'b',                     // b, STANDARD
+    AsciiChar32 = (byte)'c',              // c, non-standard
+    Float64 = (byte)'d',                  // d, non-standard
+    Float32 = (byte)'f',                  // f, STANDARD
+    Int64 = (byte)'h',                    // h, non-standard
+    Int32 = (byte)'i',                    // i, STANDARD
+    MIDI = (byte)'m',                     // m, non-standard
+    Color32 = (byte)'r',                  // r, non-standard
+    String = (byte)'s',                   // s, STANDARD
+    TimeTag = (byte)'t'                   // t, non-standard
 }
 
 public static class TypeTagMethods
