@@ -39,13 +39,13 @@
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
         </member>
-        <member name="F:BuildSoft.OscCore.OscMessageValues.Tags">
+        <member name="F:BuildSoft.OscCore.OscMessageValues._tags">
             <summary>
             All type tags in the message.
             All values past index >= ElementCount are junk data and should NEVER BE USED!
             </summary>
         </member>
-        <member name="F:BuildSoft.OscCore.OscMessageValues.Offsets">
+        <member name="F:BuildSoft.OscCore.OscMessageValues._offsets">
             <summary>
             Indexes into the shared buffer associated with each message element
             All values at index >= ElementCount are junk data and should NEVER BE USED!
@@ -395,7 +395,7 @@
             Map from the unmanaged representation of an OSC address to the delegates associated with it
             </summary>
         </member>
-        <member name="F:BuildSoft.OscCore.OscAddressMethods.SourceToBlob">
+        <member name="F:BuildSoft.OscCore.OscAddressMethods._sourceToBlob">
             <summary>
             Map from the source string of an OSC address to the unmanaged representation
             </summary>
