@@ -11,7 +11,7 @@
 	<DocumentationFile>..\..\docs\xml\$(AssemblyName).xml</DocumentationFile>
 
     <PackageId>BuildSoft.OscCore</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>ChanyaKushima</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageDescription>A performance-oriented OSC library for .NET Standard</PackageDescription>
