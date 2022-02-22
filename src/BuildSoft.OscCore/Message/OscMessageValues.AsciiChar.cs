@@ -14,12 +14,12 @@ public sealed partial class OscMessageValues
     public char ReadAsciiCharElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        return Tags[index] switch
+        return _tags[index] switch
         {
             // the ascii byte is placed at the end of the 4 bytes given for an element
-            TypeTag.AsciiChar32 => (char)m_SharedBuffer[Offsets[index] + 3],
+            TypeTag.AsciiChar32 => (char)_sharedBuffer[_offsets[index] + 3],
             _ => default,
         };
     }

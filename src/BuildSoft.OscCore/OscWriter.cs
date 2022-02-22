@@ -10,62 +10,62 @@ namespace BuildSoft.OscCore;
 public sealed unsafe class OscWriter : IDisposable
 {
     public readonly byte[] Buffer;
-    readonly byte* m_BufferPtr;
-    readonly GCHandle m_BufferHandle;
-    readonly MidiMessage* m_BufferMidiPtr;
+    readonly byte* _bufferPtr;
+    readonly GCHandle _bufferHandle;
+    readonly MidiMessage* _bufferMidiPtr;
 
-    readonly float[] m_FloatSwap = new float[1];
-    readonly byte* m_FloatSwapPtr;
-    readonly GCHandle m_FloatSwapHandle;
+    readonly float[] _floatSwap = new float[1];
+    readonly byte* _floatSwapPtr;
+    readonly GCHandle _floatSwapHandle;
 
-    readonly double[] m_DoubleSwap = new double[1];
-    readonly byte* m_DoubleSwapPtr;
-    readonly GCHandle m_DoubleSwapHandle;
+    readonly double[] _doubleSwap = new double[1];
+    readonly byte* _doubleSwapPtr;
+    readonly GCHandle _doubleSwapHandle;
 
-    readonly Color32[] m_Color32Swap = new Color32[1];
-    readonly byte* m_Color32SwapPtr;
-    readonly GCHandle m_Color32SwapHandle;
+    readonly Color32[] _color32Swap = new Color32[1];
+    readonly byte* _color32SwapPtr;
+    readonly GCHandle _color32SwapHandle;
 
-    int m_Length;
+    int _length;
 
     /// <summary>The number of bytes currently written to the buffer</summary>
-    public int Length => m_Length;
+    public int Length => _length;
 
     public OscWriter(int capacity = 4096)
     {
         Buffer = new byte[capacity];
 
         // Even though Unity's GC does not move objects around, pin them to be safe.
-        m_BufferPtr = Utils.PinPtr<byte, byte>(Buffer, out m_BufferHandle);
-        m_BufferMidiPtr = (MidiMessage*)m_BufferPtr;
+        _bufferPtr = Utils.PinPtr<byte, byte>(Buffer, out _bufferHandle);
+        _bufferMidiPtr = (MidiMessage*)_bufferPtr;
 
-        m_FloatSwapPtr = Utils.PinPtr<float, byte>(m_FloatSwap, out m_FloatSwapHandle);
-        m_DoubleSwapPtr = Utils.PinPtr<double, byte>(m_DoubleSwap, out m_DoubleSwapHandle);
-        m_Color32SwapPtr = Utils.PinPtr<Color32, byte>(m_Color32Swap, out m_Color32SwapHandle);
+        _floatSwapPtr = Utils.PinPtr<float, byte>(_floatSwap, out _floatSwapHandle);
+        _doubleSwapPtr = Utils.PinPtr<double, byte>(_doubleSwap, out _doubleSwapHandle);
+        _color32SwapPtr = Utils.PinPtr<Color32, byte>(_color32Swap, out _color32SwapHandle);
     }
 
     ~OscWriter() { Dispose(); }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Reset() { m_Length = 0; }
+    public void Reset() { _length = 0; }
 
     /// <summary>Write a 32-bit integer element</summary>
     public void Write(int data)
     {
-        Buffer[m_Length++] = (byte)(data >> 24);
-        Buffer[m_Length++] = (byte)(data >> 16);
-        Buffer[m_Length++] = (byte)(data >> 8);
-        Buffer[m_Length++] = (byte)(data);
+        Buffer[_length++] = (byte)(data >> 24);
+        Buffer[_length++] = (byte)(data >> 16);
+        Buffer[_length++] = (byte)(data >> 8);
+        Buffer[_length++] = (byte)(data);
     }
 
     /// <summary>Write a 32-bit floating point element</summary>
     public void Write(float data)
     {
-        m_FloatSwap[0] = data;
-        Buffer[m_Length++] = m_FloatSwapPtr[3];
-        Buffer[m_Length++] = m_FloatSwapPtr[2];
-        Buffer[m_Length++] = m_FloatSwapPtr[1];
-        Buffer[m_Length++] = m_FloatSwapPtr[0];
+        _floatSwap[0] = data;
+        Buffer[_length++] = _floatSwapPtr[3];
+        Buffer[_length++] = _floatSwapPtr[2];
+        Buffer[_length++] = _floatSwapPtr[1];
+        Buffer[_length++] = _floatSwapPtr[0];
     }
 
     /// <summary>Write a 2D vector as two float elements</summary>
@@ -87,7 +87,7 @@ public sealed unsafe class OscWriter : IDisposable
     public void Write(string data)
     {
         foreach (var chr in data)
-            Buffer[m_Length++] = (byte)chr;
+            Buffer[_length++] = (byte)chr;
 
         var alignedLength = (data.Length + 3) & ~3;
         // if our length was already aligned to 4 bytes, that means we don't have a string terminator yet,
@@ -96,22 +96,22 @@ public sealed unsafe class OscWriter : IDisposable
             alignedLength += 4;
 
         for (int i = data.Length; i < alignedLength; i++)
-            Buffer[m_Length++] = 0;
+            Buffer[_length++] = 0;
     }
 
     /// <summary>Write an ASCII string element. The string MUST be ASCII-encoded!</summary>
     public void Write(BlobString data)
     {
         var strLength = data.Length;
-        System.Buffer.MemoryCopy(data.Handle.Pointer, m_BufferPtr + m_Length, strLength, strLength);
-        m_Length += strLength;
+        System.Buffer.MemoryCopy(data.Handle.Pointer, _bufferPtr + _length, strLength, strLength);
+        _length += strLength;
 
         var alignedLength = (data.Length + 3) & ~3;
         if (alignedLength == data.Length)
             alignedLength += 4;
 
         for (int i = data.Length; i < alignedLength; i++)
-            Buffer[m_Length++] = 0;
+            Buffer[_length++] = 0;
     }
 
     /// <summary>Write a blob element</summary>
@@ -124,14 +124,14 @@ public sealed unsafe class OscWriter : IDisposable
             return;
 
         Write(length);
-        System.Buffer.BlockCopy(bytes, start, Buffer, m_Length, length);
-        m_Length += length;
+        System.Buffer.BlockCopy(bytes, start, Buffer, _length, length);
+        _length += length;
 
         // write any trailing zeros necessary
         var remainder = ((length + 3) & ~3) - length;
         for (int i = 0; i < remainder; i++)
         {
-            Buffer[m_Length++] = 0;
+            Buffer[_length++] = 0;
         }
     }
 
@@ -139,63 +139,63 @@ public sealed unsafe class OscWriter : IDisposable
     public void Write(long data)
     {
         var buffer = Buffer;
-        buffer[m_Length++] = (byte)(data >> 56);
-        buffer[m_Length++] = (byte)(data >> 48);
-        buffer[m_Length++] = (byte)(data >> 40);
-        buffer[m_Length++] = (byte)(data >> 32);
-        buffer[m_Length++] = (byte)(data >> 24);
-        buffer[m_Length++] = (byte)(data >> 16);
-        buffer[m_Length++] = (byte)(data >> 8);
-        buffer[m_Length++] = (byte)(data);
+        buffer[_length++] = (byte)(data >> 56);
+        buffer[_length++] = (byte)(data >> 48);
+        buffer[_length++] = (byte)(data >> 40);
+        buffer[_length++] = (byte)(data >> 32);
+        buffer[_length++] = (byte)(data >> 24);
+        buffer[_length++] = (byte)(data >> 16);
+        buffer[_length++] = (byte)(data >> 8);
+        buffer[_length++] = (byte)(data);
     }
 
     /// <summary>Write a 64-bit floating point element</summary>
     public void Write(double data)
     {
         var buffer = Buffer;
-        m_DoubleSwap[0] = data;
-        var dsPtr = m_DoubleSwapPtr;
-        buffer[m_Length++] = dsPtr[7];
-        buffer[m_Length++] = dsPtr[6];
-        buffer[m_Length++] = dsPtr[5];
-        buffer[m_Length++] = dsPtr[4];
-        buffer[m_Length++] = dsPtr[3];
-        buffer[m_Length++] = dsPtr[2];
-        buffer[m_Length++] = dsPtr[1];
-        buffer[m_Length++] = dsPtr[0];
+        _doubleSwap[0] = data;
+        var dsPtr = _doubleSwapPtr;
+        buffer[_length++] = dsPtr[7];
+        buffer[_length++] = dsPtr[6];
+        buffer[_length++] = dsPtr[5];
+        buffer[_length++] = dsPtr[4];
+        buffer[_length++] = dsPtr[3];
+        buffer[_length++] = dsPtr[2];
+        buffer[_length++] = dsPtr[1];
+        buffer[_length++] = dsPtr[0];
     }
 
     /// <summary>Write a 32-bit RGBA color element</summary>
     public void Write(Color32 data)
     {
-        m_Color32Swap[0] = data;
-        Buffer[m_Length++] = m_Color32SwapPtr[3];
-        Buffer[m_Length++] = m_Color32SwapPtr[2];
-        Buffer[m_Length++] = m_Color32SwapPtr[1];
-        Buffer[m_Length++] = m_Color32SwapPtr[0];
+        _color32Swap[0] = data;
+        Buffer[_length++] = _color32SwapPtr[3];
+        Buffer[_length++] = _color32SwapPtr[2];
+        Buffer[_length++] = _color32SwapPtr[1];
+        Buffer[_length++] = _color32SwapPtr[0];
     }
 
     /// <summary>Write a MIDI message element</summary>
     public void Write(MidiMessage data)
     {
-        var midiWritePtr = (MidiMessage*)(m_BufferPtr + m_Length);
+        var midiWritePtr = (MidiMessage*)(_bufferPtr + _length);
         *midiWritePtr = data;
-        m_Length += 4;
+        _length += 4;
     }
 
     /// <summary>Write a 64-bit NTP timestamp element</summary>
     public void Write(NtpTimestamp time)
     {
-        time.ToBigEndianBytes((uint*)(m_BufferPtr + m_Length));
-        m_Length += 8;
+        time.ToBigEndianBytes((uint*)(_bufferPtr + _length));
+        _length += 8;
     }
 
     /// <summary>Write a single ascii character element</summary>
     public void Write(char data)
     {
         // char is written in the last byte of the 4-byte block;
-        Buffer[m_Length + 3] = (byte)data;
-        m_Length += 4;
+        Buffer[_length + 3] = (byte)data;
+        _length += 4;
     }
 
     /// <summary>Write '#bundle ' at the start of a bundled message</summary>
@@ -203,8 +203,8 @@ public sealed unsafe class OscWriter : IDisposable
     {
         const int size = 8;
         // TODO replace with dereferencing the long  version ?
-        System.Buffer.BlockCopy(Constant.BundlePrefixBytes, 0, Buffer, m_Length, size);
-        m_Length += size;
+        System.Buffer.BlockCopy(Constant.BundlePrefixBytes, 0, Buffer, _length, size);
+        _length += size;
     }
 
     /// <summary>
@@ -214,9 +214,9 @@ public sealed unsafe class OscWriter : IDisposable
     /// <param name="tags">4 bytes that represent up to 3 type tags</param>
     public void WriteAddressAndTags(string address, uint tags)
     {
-        m_Length = 0;
+        _length = 0;
         foreach (var chr in address)
-            Buffer[m_Length++] = (byte)chr;
+            Buffer[_length++] = (byte)chr;
 
         var alignedLength = (address.Length + 3) & ~3;
         // if our length was already aligned to 4 bytes, that means we don't have a string terminator yet,
@@ -225,11 +225,11 @@ public sealed unsafe class OscWriter : IDisposable
             alignedLength += 4;
 
         for (int i = address.Length; i < alignedLength; i++)
-            Buffer[m_Length++] = 0;
+            Buffer[_length++] = 0;
 
         // write the 4 bytes for the type tags
-        ((uint*)(m_BufferPtr + m_Length))[0] = tags;
-        m_Length += 4;
+        ((uint*)(_bufferPtr + _length))[0] = tags;
+        _length += 4;
     }
 
     public void CopyBuffer(byte[] copyTo, int copyOffset = 0)
@@ -239,9 +239,9 @@ public sealed unsafe class OscWriter : IDisposable
 
     public void Dispose()
     {
-        m_BufferHandle.SafeFree();
-        m_Color32SwapHandle.SafeFree();
-        m_FloatSwapHandle.SafeFree();
-        m_DoubleSwapHandle.SafeFree();
+        _bufferHandle.SafeFree();
+        _color32SwapHandle.SafeFree();
+        _floatSwapHandle.SafeFree();
+        _doubleSwapHandle.SafeFree();
     }
 }

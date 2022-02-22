@@ -13,12 +13,12 @@ public sealed unsafe partial class OscMessageValues
     public NtpTimestamp ReadTimestampElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        switch (Tags[index])
+        switch (_tags[index])
         {
             case TypeTag.TimeTag:
-                return NtpTimestamp.FromBigEndianBytes(SharedBufferPtr + Offsets[index]);
+                return NtpTimestamp.FromBigEndianBytes(_sharedBufferPtr + _offsets[index]);
             default:
                 return default;
         }
@@ -34,15 +34,15 @@ public sealed unsafe partial class OscMessageValues
     public NtpTimestamp ReadTimestampElementUnchecked(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var ptr = SharedBufferPtr + Offsets[index];
+        var ptr = _sharedBufferPtr + _offsets[index];
         return NtpTimestamp.FromBigEndianBytes(ptr);
     }
 
     internal NtpTimestamp ReadTimestampIndex(int index)
     {
-        var ptr = SharedBufferPtr + index;
+        var ptr = _sharedBufferPtr + index;
 
         var bSeconds = *(uint*)ptr;
         // swap bytes from big to little endian 

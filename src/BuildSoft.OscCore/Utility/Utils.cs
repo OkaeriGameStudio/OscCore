@@ -10,8 +10,8 @@ namespace BuildSoft.OscCore;
 
 static class Utils
 {
-    static readonly List<char> k_TempChars = new List<char>();
-    static readonly StringBuilder k_Builder = new StringBuilder();
+    static readonly List<char> _tempChars = new List<char>();
+    static readonly StringBuilder _builder = new StringBuilder();
 
     public static bool ValidateAddress(ref string address)
     {
@@ -28,9 +28,9 @@ static class Utils
 
     internal static string ReplaceInvalidAddressCharacters(string address)
     {
-        k_TempChars.Clear();
-        k_TempChars.AddRange(address.Where(OscParser.CharacterIsValidInAddress));
-        return new string(k_TempChars.ToArray());
+        _tempChars.Clear();
+        _tempChars.AddRange(address.Where(OscParser.CharacterIsValidInAddress));
+        return new string(_tempChars.ToArray());
     }
 
     public static unsafe TPtr* PinPtr<TData, TPtr>(TData[] array, out GCHandle handle)
@@ -58,22 +58,22 @@ static class Utils
 
     public static string MonitorMessageToString(BlobString address, OscMessageValues values)
     {
-        k_Builder.Clear();
-        k_Builder.Append(address.ToString());
+        _builder.Clear();
+        _builder.Append(address.ToString());
         const string divider = "  ,";
-        k_Builder.Append(divider);
-        values.ForEachElement((i, type) => { k_Builder.Append((char)type); });
-        k_Builder.Append("  ");
+        _builder.Append(divider);
+        values.ForEachElement((i, type) => { _builder.Append((char)type); });
+        _builder.Append("  ");
 
         var lastIndex = values.ElementCount - 1;
         values.ForEachElement((i, type) =>
         {
             var elementText = values.ReadStringElement(i);
-            k_Builder.Append(elementText);
-            if (i != lastIndex) k_Builder.Append(' ');
+            _builder.Append(elementText);
+            if (i != lastIndex) _builder.Append(' ');
         });
 
-        return k_Builder.ToString();
+        return _builder.ToString();
     }
 
 }

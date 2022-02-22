@@ -13,22 +13,22 @@ public sealed unsafe partial class OscMessageValues
     public int ReadIntElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        switch (Tags[index])
+        var offset = _offsets[index];
+        switch (_tags[index])
         {
             case TypeTag.Int32:
-                return m_SharedBuffer[offset] << 24 |
-                       m_SharedBuffer[offset + 1] << 16 |
-                       m_SharedBuffer[offset + 2] << 8 |
-                       m_SharedBuffer[offset + 3];
+                return _sharedBuffer[offset] << 24 |
+                       _sharedBuffer[offset + 1] << 16 |
+                       _sharedBuffer[offset + 2] << 8 |
+                       _sharedBuffer[offset + 3];
             case TypeTag.Float32:
-                m_SwapBuffer32[0] = m_SharedBuffer[offset + 3];
-                m_SwapBuffer32[1] = m_SharedBuffer[offset + 2];
-                m_SwapBuffer32[2] = m_SharedBuffer[offset + 1];
-                m_SwapBuffer32[3] = m_SharedBuffer[offset];
-                float f = *SwapBuffer32Ptr;
+                _swapBuffer32[0] = _sharedBuffer[offset + 3];
+                _swapBuffer32[1] = _sharedBuffer[offset + 2];
+                _swapBuffer32[2] = _sharedBuffer[offset + 1];
+                _swapBuffer32[3] = _sharedBuffer[offset];
+                float f = *_swapBuffer32Ptr;
                 return (int)f;
             default:
                 return default;
@@ -46,31 +46,31 @@ public sealed unsafe partial class OscMessageValues
     public int ReadIntElementUnchecked(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        return m_SharedBuffer[offset] << 24 |
-               m_SharedBuffer[offset + 1] << 16 |
-               m_SharedBuffer[offset + 2] << 8 |
-               m_SharedBuffer[offset + 3];
+        var offset = _offsets[index];
+        return _sharedBuffer[offset] << 24 |
+               _sharedBuffer[offset + 1] << 16 |
+               _sharedBuffer[offset + 2] << 8 |
+               _sharedBuffer[offset + 3];
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal uint ReadUIntIndex(int index)
     {
-        m_SwapBuffer32[0] = m_SharedBuffer[index + 3];
-        m_SwapBuffer32[1] = m_SharedBuffer[index + 2];
-        m_SwapBuffer32[2] = m_SharedBuffer[index + 1];
-        m_SwapBuffer32[3] = m_SharedBuffer[index];
-        return *SwapBuffer32UintPtr;
+        _swapBuffer32[0] = _sharedBuffer[index + 3];
+        _swapBuffer32[1] = _sharedBuffer[index + 2];
+        _swapBuffer32[2] = _sharedBuffer[index + 1];
+        _swapBuffer32[3] = _sharedBuffer[index];
+        return *_swapBuffer32UintPtr;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal int ReadIntIndex(int index)
     {
-        return m_SharedBuffer[index] << 24 |
-               m_SharedBuffer[index + 1] << 16 |
-               m_SharedBuffer[index + 2] << 8 |
-               m_SharedBuffer[index + 3];
+        return _sharedBuffer[index] << 24 |
+               _sharedBuffer[index + 1] << 16 |
+               _sharedBuffer[index + 2] << 8 |
+               _sharedBuffer[index + 3];
     }
 }

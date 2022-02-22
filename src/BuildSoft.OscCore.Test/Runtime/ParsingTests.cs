@@ -40,7 +40,7 @@ public class ParsingTests
         var tagCount = tagSize - 1; // remove ','
 
         Assert.AreEqual(test.Expected.Length, tagCount);
-        var tags = m_Parser.MessageValues.Tags;
+        var tags = m_Parser.MessageValues._tags;
         for (var i = 0; i < tagCount; i++)
         {
             var tag = tags[i];

@@ -13,45 +13,45 @@ public sealed unsafe partial class OscMessageValues
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
-    public string ReadStringElement(int index)
+    public string? ReadStringElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        switch (Tags[index])
+        var offset = _offsets[index];
+        switch (_tags[index])
         {
             case TypeTag.AltTypeString:
             case TypeTag.String:
                 var length = 0;
-                while (m_SharedBuffer[offset + length] != byte.MinValue) length++;
-                return Encoding.ASCII.GetString(m_SharedBuffer, offset, length);
+                while (_sharedBuffer[offset + length] != byte.MinValue) length++;
+                return Encoding.ASCII.GetString(_sharedBuffer, offset, length);
             case TypeTag.Float64:
-                m_SwapBuffer64[7] = m_SharedBuffer[offset];
-                m_SwapBuffer64[6] = m_SharedBuffer[offset + 1];
-                m_SwapBuffer64[5] = m_SharedBuffer[offset + 2];
-                m_SwapBuffer64[4] = m_SharedBuffer[offset + 3];
-                m_SwapBuffer64[3] = m_SharedBuffer[offset + 4];
-                m_SwapBuffer64[2] = m_SharedBuffer[offset + 5];
-                m_SwapBuffer64[1] = m_SharedBuffer[offset + 6];
-                m_SwapBuffer64[0] = m_SharedBuffer[offset + 7];
-                double f64 = *SwapBuffer64Ptr;
+                _swapBuffer64[7] = _sharedBuffer[offset];
+                _swapBuffer64[6] = _sharedBuffer[offset + 1];
+                _swapBuffer64[5] = _sharedBuffer[offset + 2];
+                _swapBuffer64[4] = _sharedBuffer[offset + 3];
+                _swapBuffer64[3] = _sharedBuffer[offset + 4];
+                _swapBuffer64[2] = _sharedBuffer[offset + 5];
+                _swapBuffer64[1] = _sharedBuffer[offset + 6];
+                _swapBuffer64[0] = _sharedBuffer[offset + 7];
+                double f64 = *_swapBuffer64Ptr;
                 return f64.ToString(CultureInfo.CurrentCulture);
             case TypeTag.Float32:
-                m_SwapBuffer32[0] = m_SharedBuffer[offset + 3];
-                m_SwapBuffer32[1] = m_SharedBuffer[offset + 2];
-                m_SwapBuffer32[2] = m_SharedBuffer[offset + 1];
-                m_SwapBuffer32[3] = m_SharedBuffer[offset];
-                float f32 = *SwapBuffer32Ptr;
+                _swapBuffer32[0] = _sharedBuffer[offset + 3];
+                _swapBuffer32[1] = _sharedBuffer[offset + 2];
+                _swapBuffer32[2] = _sharedBuffer[offset + 1];
+                _swapBuffer32[3] = _sharedBuffer[offset];
+                float f32 = *_swapBuffer32Ptr;
                 return f32.ToString(CultureInfo.CurrentCulture);
             case TypeTag.Int64:
-                var i64 = IPAddress.NetworkToHostOrder(m_SharedBuffer[offset]);
+                var i64 = IPAddress.NetworkToHostOrder(_sharedBuffer[offset]);
                 return i64.ToString(CultureInfo.CurrentCulture);
             case TypeTag.Int32:
-                int i32 = m_SharedBuffer[offset] << 24 |
-                          m_SharedBuffer[offset + 1] << 16 |
-                          m_SharedBuffer[offset + 2] << 8 |
-                          m_SharedBuffer[offset + 3];
+                int i32 = _sharedBuffer[offset] << 24 |
+                          _sharedBuffer[offset + 1] << 16 |
+                          _sharedBuffer[offset + 2] << 8 |
+                          _sharedBuffer[offset + 3];
                 return i32.ToString(CultureInfo.CurrentCulture);
             case TypeTag.False:
                 return "False";
@@ -62,19 +62,19 @@ public sealed unsafe partial class OscMessageValues
             case TypeTag.Infinitum:
                 return "Infinitum";
             case TypeTag.Color32:
-                m_SwapBuffer32[0] = m_SharedBuffer[offset + 3];
-                m_SwapBuffer32[1] = m_SharedBuffer[offset + 2];
-                m_SwapBuffer32[2] = m_SharedBuffer[offset + 1];
-                m_SwapBuffer32[3] = m_SharedBuffer[offset];
-                var color32 = *SwapBufferColor32Ptr;
+                _swapBuffer32[0] = _sharedBuffer[offset + 3];
+                _swapBuffer32[1] = _sharedBuffer[offset + 2];
+                _swapBuffer32[2] = _sharedBuffer[offset + 1];
+                _swapBuffer32[3] = _sharedBuffer[offset];
+                var color32 = *_swapBufferColor32Ptr;
                 return color32.ToString();
             case TypeTag.MIDI:
-                var midiPtr = SharedBufferPtr + offset;
+                var midiPtr = _sharedBufferPtr + offset;
                 var midi = *(MidiMessage*)midiPtr;
                 return midi.ToString();
             case TypeTag.AsciiChar32:
                 // ascii chars are encoded in the last byte of the 4-byte block
-                return ((char)m_SharedBuffer[offset + 3]).ToString();
+                return ((char)_sharedBuffer[offset + 3]).ToString();
             default:
                 return string.Empty;
         }
@@ -90,17 +90,17 @@ public sealed unsafe partial class OscMessageValues
     public int ReadStringElementBytes(int index, byte[] copyTo)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        switch (Tags[index])
+        switch (_tags[index])
         {
             case TypeTag.AltTypeString:
             case TypeTag.String:
                 int i;
-                var offset = Offsets[index];
-                for (i = offset; i < m_SharedBuffer.Length; i++)
+                var offset = _offsets[index];
+                for (i = offset; i < _sharedBuffer.Length; i++)
                 {
-                    byte b = m_SharedBuffer[i];
+                    byte b = _sharedBuffer[i];
                     if (b == byte.MinValue) break;
                     copyTo[i - offset] = b;
                 }
@@ -121,19 +121,19 @@ public sealed unsafe partial class OscMessageValues
     public int ReadStringElementBytes(int index, byte[] copyTo, int copyOffset)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        switch (Tags[index])
+        switch (_tags[index])
         {
             case TypeTag.AltTypeString:
             case TypeTag.String:
                 int i;
-                var offset = Offsets[index];
+                var offset = _offsets[index];
                 // when this is subtracted from i, it's the same as i - offset + copyOffset
                 var copyStartOffset = offset - copyOffset;
-                for (i = offset; i < m_SharedBuffer.Length; i++)
+                for (i = offset; i < _sharedBuffer.Length; i++)
                 {
-                    byte b = m_SharedBuffer[i];
+                    byte b = _sharedBuffer[i];
                     if (b == byte.MinValue) break;
                     copyTo[i - copyStartOffset] = b;
                 }

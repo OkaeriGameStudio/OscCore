@@ -11,9 +11,9 @@ public unsafe class OscParser
     public const int MaxElementsPerMessage = 32;
     public const int MaxBlobSize = 1024 * 256;
 
-    internal readonly byte[] Buffer;
-    internal readonly byte* BufferPtr;
-    internal readonly long* BufferLongPtr;
+    internal readonly byte[] _buffer;
+    internal readonly byte* _bufferPtr;
+    internal readonly long* _bufferLongPtr;
 
     /// <summary>
     /// Holds all parsed values.  After calling Parse(), this should have data available to read
@@ -24,13 +24,13 @@ public unsafe class OscParser
     /// <param name="fixedBuffer">The buffer to read messages from.  Must be fixed in memory !</param>
     public OscParser(byte[] fixedBuffer)
     {
-        Buffer = fixedBuffer;
+        _buffer = fixedBuffer;
         fixed (byte* ptr = fixedBuffer)
         {
-            BufferPtr = ptr;
-            BufferLongPtr = (long*)ptr;
+            _bufferPtr = ptr;
+            _bufferLongPtr = (long*)ptr;
         }
-        MessageValues = new OscMessageValues(Buffer, MaxElementsPerMessage);
+        MessageValues = new OscMessageValues(_buffer, MaxElementsPerMessage);
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public unsafe class OscParser
         if (alignedAddressLength == addressLength)
             alignedAddressLength += 4;
 
-        var tagSize = ParseTags(Buffer, alignedAddressLength);
+        var tagSize = ParseTags(_buffer, alignedAddressLength);
         var offset = alignedAddressLength + (tagSize + 4) & ~3;
         FindOffsets(offset);
         return addressLength;
@@ -76,7 +76,7 @@ public unsafe class OscParser
             alignedAddressLength += 4;
 
         var startPlusAlignedLength = startingByteOffset + alignedAddressLength;
-        var tagSize = ParseTags(Buffer, startPlusAlignedLength);
+        var tagSize = ParseTags(_buffer, startPlusAlignedLength);
         var offset = startPlusAlignedLength + (tagSize + 4) & ~3;
         FindOffsets(offset);
         return addressLength;
@@ -172,7 +172,7 @@ public unsafe class OscParser
 
         var tagIndex = start + 1;         // skip the starting ','
         var outIndex = 0;
-        var tags = MessageValues.Tags;
+        var tags = MessageValues._tags;
         while (true)
         {
             var tag = (TypeTag)bytes[tagIndex];
@@ -189,7 +189,7 @@ public unsafe class OscParser
 
     public int FindUnalignedAddressLength()
     {
-        if (BufferPtr[0] != Constant.ForwardSlash)
+        if (_bufferPtr[0] != Constant.ForwardSlash)
             return -1;
 
         var index = 1;
@@ -197,13 +197,13 @@ public unsafe class OscParser
         {
             index++;
         }
-        while (BufferPtr[index] != byte.MinValue);
+        while (_bufferPtr[index] != byte.MinValue);
         return index;
     }
 
     public int FindUnalignedAddressLength(int offset)
     {
-        if (BufferPtr[offset] != Constant.ForwardSlash)
+        if (_bufferPtr[offset] != Constant.ForwardSlash)
             return -1;
 
         var index = offset + 1;
@@ -211,7 +211,7 @@ public unsafe class OscParser
         {
             index++;
         }
-        while (BufferPtr[index] != byte.MinValue);
+        while (_bufferPtr[index] != byte.MinValue);
 
         var length = index - offset;
         return length;
@@ -219,11 +219,11 @@ public unsafe class OscParser
 
     public int GetStringLength(int offset)
     {
-        var end = Buffer.Length - offset;
+        var end = _buffer.Length - offset;
         int index;
         for (index = offset; index < end; index++)
         {
-            if (Buffer[index] != 0) break;
+            if (_buffer[index] != 0) break;
         }
 
         var length = index - offset;
@@ -234,8 +234,8 @@ public unsafe class OscParser
     /// <param name="offset">The byte index of the first value</param>
     public void FindOffsets(int offset)
     {
-        var tags = MessageValues.Tags;
-        var offsets = MessageValues.Offsets;
+        var tags = MessageValues._tags;
+        var offsets = MessageValues._offsets;
         for (int i = 0; i < MessageValues.ElementCount; i++)
         {
             offsets[i] = offset;
@@ -260,7 +260,7 @@ public unsafe class OscParser
                     break;
                 case TypeTag.Blob:
                     // read the int that specifies the size of the blob
-                    offset += 4 + *(int*)(BufferPtr + offset);
+                    offset += 4 + *(int*)(_bufferPtr + offset);
                     break;
             }
         }
@@ -274,7 +274,7 @@ public unsafe class OscParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsBundleTagAtIndex(int index)
     {
-        return *((long*)BufferPtr + index) == Constant.BundlePrefixLong;
+        return *((long*)_bufferPtr + index) == Constant.BundlePrefixLong;
     }
 
     public static int FindArrayLength(byte[] bytes, int offset = 0)

@@ -13,9 +13,9 @@ public sealed partial class OscMessageValues
     public bool ReadNilOrInfinitumElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        switch (Tags[index])
+        switch (_tags[index])
         {
             case TypeTag.Infinitum:
             case TypeTag.Nil: return true;

@@ -14,17 +14,17 @@ public sealed unsafe partial class OscMessageValues
     public Color32 ReadColor32Element(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        switch (Tags[index])
+        var offset = _offsets[index];
+        switch (_tags[index])
         {
             case TypeTag.Color32:
-                m_SwapBuffer32[0] = m_SharedBuffer[offset + 3];
-                m_SwapBuffer32[1] = m_SharedBuffer[offset + 2];
-                m_SwapBuffer32[2] = m_SharedBuffer[offset + 1];
-                m_SwapBuffer32[3] = m_SharedBuffer[offset];
-                return *SwapBufferColor32Ptr;
+                _swapBuffer32[0] = _sharedBuffer[offset + 3];
+                _swapBuffer32[1] = _sharedBuffer[offset + 2];
+                _swapBuffer32[2] = _sharedBuffer[offset + 1];
+                _swapBuffer32[3] = _sharedBuffer[offset];
+                return *_swapBufferColor32Ptr;
             default:
                 return default;
         }
@@ -41,13 +41,13 @@ public sealed unsafe partial class OscMessageValues
     public Color32 ReadColor32ElementUnchecked(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        m_SwapBuffer32[0] = m_SharedBuffer[offset + 3];
-        m_SwapBuffer32[1] = m_SharedBuffer[offset + 2];
-        m_SwapBuffer32[2] = m_SharedBuffer[offset + 1];
-        m_SwapBuffer32[3] = m_SharedBuffer[offset];
-        return *SwapBufferColor32Ptr;
+        var offset = _offsets[index];
+        _swapBuffer32[0] = _sharedBuffer[offset + 3];
+        _swapBuffer32[1] = _sharedBuffer[offset + 2];
+        _swapBuffer32[2] = _sharedBuffer[offset + 1];
+        _swapBuffer32[3] = _sharedBuffer[offset];
+        return *_swapBufferColor32Ptr;
     }
 }

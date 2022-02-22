@@ -14,35 +14,35 @@ public sealed unsafe partial class OscMessageValues
     public double ReadFloat64Element(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        switch (Tags[index])
+        var offset = _offsets[index];
+        switch (_tags[index])
         {
             case TypeTag.Float64:
-                m_SwapBuffer64[7] = m_SharedBuffer[offset];
-                m_SwapBuffer64[6] = m_SharedBuffer[offset + 1];
-                m_SwapBuffer64[5] = m_SharedBuffer[offset + 2];
-                m_SwapBuffer64[4] = m_SharedBuffer[offset + 3];
-                m_SwapBuffer64[3] = m_SharedBuffer[offset + 4];
-                m_SwapBuffer64[2] = m_SharedBuffer[offset + 5];
-                m_SwapBuffer64[1] = m_SharedBuffer[offset + 6];
-                m_SwapBuffer64[0] = m_SharedBuffer[offset + 7];
-                return *SwapBuffer64Ptr;
+                _swapBuffer64[7] = _sharedBuffer[offset];
+                _swapBuffer64[6] = _sharedBuffer[offset + 1];
+                _swapBuffer64[5] = _sharedBuffer[offset + 2];
+                _swapBuffer64[4] = _sharedBuffer[offset + 3];
+                _swapBuffer64[3] = _sharedBuffer[offset + 4];
+                _swapBuffer64[2] = _sharedBuffer[offset + 5];
+                _swapBuffer64[1] = _sharedBuffer[offset + 6];
+                _swapBuffer64[0] = _sharedBuffer[offset + 7];
+                return *_swapBuffer64Ptr;
             case TypeTag.Float32:
-                m_SwapBuffer32[0] = m_SharedBuffer[offset + 3];
-                m_SwapBuffer32[1] = m_SharedBuffer[offset + 2];
-                m_SwapBuffer32[2] = m_SharedBuffer[offset + 1];
-                m_SwapBuffer32[3] = m_SharedBuffer[offset];
-                return *SwapBuffer32Ptr;
+                _swapBuffer32[0] = _sharedBuffer[offset + 3];
+                _swapBuffer32[1] = _sharedBuffer[offset + 2];
+                _swapBuffer32[2] = _sharedBuffer[offset + 1];
+                _swapBuffer32[3] = _sharedBuffer[offset];
+                return *_swapBuffer32Ptr;
             case TypeTag.Int64:
-                long bigEndian = *(SharedBufferPtr + offset);
+                long bigEndian = *(_sharedBufferPtr + offset);
                 return IPAddress.NetworkToHostOrder(bigEndian);
             case TypeTag.Int32:
-                return m_SharedBuffer[index] << 24 |
-                       m_SharedBuffer[index + 1] << 16 |
-                       m_SharedBuffer[index + 2] << 8 |
-                       m_SharedBuffer[index + 3];
+                return _sharedBuffer[index] << 24 |
+                       _sharedBuffer[index + 1] << 16 |
+                       _sharedBuffer[index + 2] << 8 |
+                       _sharedBuffer[index + 3];
         }
 
         return default;
@@ -59,17 +59,17 @@ public sealed unsafe partial class OscMessageValues
     public double ReadFloat64ElementUnchecked(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        m_SwapBuffer64[7] = m_SharedBuffer[offset];
-        m_SwapBuffer64[6] = m_SharedBuffer[offset + 1];
-        m_SwapBuffer64[5] = m_SharedBuffer[offset + 2];
-        m_SwapBuffer64[4] = m_SharedBuffer[offset + 3];
-        m_SwapBuffer64[3] = m_SharedBuffer[offset + 4];
-        m_SwapBuffer64[2] = m_SharedBuffer[offset + 5];
-        m_SwapBuffer64[1] = m_SharedBuffer[offset + 6];
-        m_SwapBuffer64[0] = m_SharedBuffer[offset + 7];
-        return *SwapBuffer64Ptr;
+        var offset = _offsets[index];
+        _swapBuffer64[7] = _sharedBuffer[offset];
+        _swapBuffer64[6] = _sharedBuffer[offset + 1];
+        _swapBuffer64[5] = _sharedBuffer[offset + 2];
+        _swapBuffer64[4] = _sharedBuffer[offset + 3];
+        _swapBuffer64[3] = _sharedBuffer[offset + 4];
+        _swapBuffer64[2] = _sharedBuffer[offset + 5];
+        _swapBuffer64[1] = _sharedBuffer[offset + 6];
+        _swapBuffer64[0] = _sharedBuffer[offset + 7];
+        return *_swapBuffer64Ptr;
     }
 }

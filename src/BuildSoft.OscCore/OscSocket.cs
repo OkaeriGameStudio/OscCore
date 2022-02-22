@@ -7,10 +7,10 @@ namespace BuildSoft.OscCore;
 
 sealed class OscSocket : IDisposable
 {
-    readonly Socket m_Socket;
+    readonly Socket _socket;
     readonly Task _task;
-    bool m_Disposed;
-    bool m_Started;
+    bool _disposed;
+    bool _started;
 
     public int Port { get; }
     public OscServer Server { get; }
@@ -18,7 +18,7 @@ sealed class OscSocket : IDisposable
     public OscSocket(int port, OscServer server)
     {
         Port = port;
-        m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp) { ReceiveTimeout = int.MaxValue };
+        _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp) { ReceiveTimeout = int.MaxValue };
         _task = new Task(Serve);
         Server = server;
     }
@@ -26,14 +26,14 @@ sealed class OscSocket : IDisposable
     public void Start()
     {
         // make sure redundant calls don't do anything after the first
-        if (m_Started) return;
+        if (_started) return;
 
-        m_Disposed = false;
-        if (!m_Socket.IsBound)
-            m_Socket.Bind(new IPEndPoint(IPAddress.Any, Port));
+        _disposed = false;
+        if (!_socket.IsBound)
+            _socket.Bind(new IPEndPoint(IPAddress.Any, Port));
 
         _task.Start();
-        m_Started = true;
+        _started = true;
     }
 
     void Serve()
@@ -41,10 +41,10 @@ sealed class OscSocket : IDisposable
 #if UNITY_EDITOR
             Profiler.BeginThreadProfiling("OscCore", "Server");
 #endif
-        var buffer = Server.Parser.Buffer;
-        var socket = m_Socket;
+        var buffer = Server.Parser._buffer;
+        var socket = _socket;
 
-        while (!m_Disposed)
+        while (!_disposed)
         {
             try
             {
@@ -57,7 +57,7 @@ sealed class OscSocket : IDisposable
             catch (SocketException) { }
             catch (Exception)
             {
-                if (!m_Disposed) throw;
+                if (!_disposed) throw;
                 break;
             }
         }
@@ -65,9 +65,9 @@ sealed class OscSocket : IDisposable
 
     public void Dispose()
     {
-        if (m_Disposed) return;
-        m_Socket.Close();
-        m_Socket.Dispose();
-        m_Disposed = true;
+        if (_disposed) return;
+        _socket.Close();
+        _socket.Dispose();
+        _disposed = true;
     }
 }

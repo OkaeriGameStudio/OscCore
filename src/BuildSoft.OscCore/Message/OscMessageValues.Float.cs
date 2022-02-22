@@ -13,22 +13,22 @@ public sealed unsafe partial class OscMessageValues
     public float ReadFloatElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        switch (Tags[index])
+        var offset = _offsets[index];
+        switch (_tags[index])
         {
             case TypeTag.Float32:
-                m_SwapBuffer32[0] = SharedBufferPtr[offset + 3];
-                m_SwapBuffer32[1] = SharedBufferPtr[offset + 2];
-                m_SwapBuffer32[2] = SharedBufferPtr[offset + 1];
-                m_SwapBuffer32[3] = SharedBufferPtr[offset];
-                return *SwapBuffer32Ptr;
+                _swapBuffer32[0] = _sharedBufferPtr[offset + 3];
+                _swapBuffer32[1] = _sharedBufferPtr[offset + 2];
+                _swapBuffer32[2] = _sharedBufferPtr[offset + 1];
+                _swapBuffer32[3] = _sharedBufferPtr[offset];
+                return *_swapBuffer32Ptr;
             case TypeTag.Int32:
-                return SharedBufferPtr[index] << 24 |
-                       SharedBufferPtr[index + 1] << 16 |
-                       SharedBufferPtr[index + 2] << 8 |
-                       SharedBufferPtr[index + 3];
+                return _sharedBufferPtr[index] << 24 |
+                       _sharedBufferPtr[index + 1] << 16 |
+                       _sharedBufferPtr[index + 2] << 8 |
+                       _sharedBufferPtr[index + 3];
             default:
                 return default;
         }
@@ -45,13 +45,13 @@ public sealed unsafe partial class OscMessageValues
     public float ReadFloatElementUnchecked(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        var offset = Offsets[index];
-        m_SwapBuffer32[0] = SharedBufferPtr[offset + 3];
-        m_SwapBuffer32[1] = SharedBufferPtr[offset + 2];
-        m_SwapBuffer32[2] = SharedBufferPtr[offset + 1];
-        m_SwapBuffer32[3] = SharedBufferPtr[offset];
-        return *SwapBuffer32Ptr;
+        var offset = _offsets[index];
+        _swapBuffer32[0] = _sharedBufferPtr[offset + 3];
+        _swapBuffer32[1] = _sharedBufferPtr[offset + 2];
+        _swapBuffer32[2] = _sharedBufferPtr[offset + 1];
+        _swapBuffer32[3] = _sharedBufferPtr[offset];
+        return *_swapBuffer32Ptr;
     }
 }

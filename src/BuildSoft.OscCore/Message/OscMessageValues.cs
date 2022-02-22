@@ -16,30 +16,30 @@ namespace BuildSoft.OscCore;
 public sealed unsafe partial class OscMessageValues
 {
     // the buffer where we read messages from - usually provided + filled by a socket reader
-    readonly byte[] m_SharedBuffer;
-    readonly byte* SharedBufferPtr;
+    readonly byte[] _sharedBuffer;
+    readonly byte* _sharedBufferPtr;
     // used to swap bytes for 32-bit numbers when reading
-    readonly byte[] m_SwapBuffer32 = new byte[4];
-    readonly float* SwapBuffer32Ptr;
-    readonly uint* SwapBuffer32UintPtr;
-    readonly Color32* SwapBufferColor32Ptr;
-    readonly GCHandle m_Swap32Handle;
+    readonly byte[] _swapBuffer32 = new byte[4];
+    readonly float* _swapBuffer32Ptr;
+    readonly uint* _swapBuffer32UintPtr;
+    readonly Color32* _swapBufferColor32Ptr;
+    readonly GCHandle _swap32Handle;
     // used to swap bytes for 64-bit numbers when reading
-    readonly byte[] m_SwapBuffer64 = new byte[8];
-    readonly double* SwapBuffer64Ptr;
-    readonly GCHandle m_Swap64Handle;
+    readonly byte[] _swapBuffer64 = new byte[8];
+    readonly double* _swapBuffer64Ptr;
+    readonly GCHandle _swap64Handle;
 
     /// <summary>
     /// All type tags in the message.
     /// All values past index >= ElementCount are junk data and should NEVER BE USED!
     /// </summary>
-    internal readonly TypeTag[] Tags;
+    internal readonly TypeTag[] _tags;
 
     /// <summary>
     /// Indexes into the shared buffer associated with each message element
     /// All values at index >= ElementCount are junk data and should NEVER BE USED!
     /// </summary>
-    internal readonly int[] Offsets;
+    internal readonly int[] _offsets;
 
     /// <summary>The number of elements in the OSC Message</summary>
     public int ElementCount { get; internal set; }
@@ -47,26 +47,26 @@ public sealed unsafe partial class OscMessageValues
     internal OscMessageValues(byte[] buffer, int elementCapacity = 8)
     {
         ElementCount = 0;
-        Tags = new TypeTag[elementCapacity];
-        Offsets = new int[elementCapacity];
-        m_SharedBuffer = buffer;
+        _tags = new TypeTag[elementCapacity];
+        _offsets = new int[elementCapacity];
+        _sharedBuffer = buffer;
 
-        fixed (byte* bufferPtr = buffer) { SharedBufferPtr = bufferPtr; }
+        fixed (byte* bufferPtr = buffer) { _sharedBufferPtr = bufferPtr; }
 
         // pin byte swap buffers in place, so that we can count on the pointers never changing
-        m_Swap32Handle = GCHandle.Alloc(m_SwapBuffer32, GCHandleType.Pinned);
-        var swap32Ptr = m_Swap32Handle.AddrOfPinnedObject();
-        SwapBuffer32Ptr = (float*)swap32Ptr;
-        SwapBuffer32UintPtr = (uint*)swap32Ptr;
-        SwapBufferColor32Ptr = (Color32*)(byte*)swap32Ptr;
+        _swap32Handle = GCHandle.Alloc(_swapBuffer32, GCHandleType.Pinned);
+        var swap32Ptr = _swap32Handle.AddrOfPinnedObject();
+        _swapBuffer32Ptr = (float*)swap32Ptr;
+        _swapBuffer32UintPtr = (uint*)swap32Ptr;
+        _swapBufferColor32Ptr = (Color32*)(byte*)swap32Ptr;
 
-        SwapBuffer64Ptr = Utils.PinPtr<byte, double>(m_SwapBuffer64, out m_Swap64Handle);
+        _swapBuffer64Ptr = Utils.PinPtr<byte, double>(_swapBuffer64, out _swap64Handle);
     }
 
     ~OscMessageValues()
     {
-        m_Swap32Handle.Free();
-        m_Swap64Handle.Free();
+        _swap32Handle.Free();
+        _swap64Handle.Free();
     }
 
     /// <summary>Execute a method for every element in the message</summary>
@@ -74,7 +74,7 @@ public sealed unsafe partial class OscMessageValues
     public void ForEachElement(Action<int, TypeTag> elementAction)
     {
         for (int i = 0; i < ElementCount; i++)
-            elementAction(i, Tags[i]);
+            elementAction(i, _tags[i]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

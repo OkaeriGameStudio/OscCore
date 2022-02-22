@@ -6,26 +6,26 @@ namespace BuildSoft.OscCore;
 
 public sealed class OscAddressSpace
 {
-    const int k_DefaultPatternCapacity = 8;
-    const int k_DefaultCapacity = 16;
+    const int DefaultPatternCapacity = 8;
+    const int DefaultCapacity = 16;
 
-    internal readonly OscAddressMethods AddressToMethod;
+    internal readonly OscAddressMethods _addressToMethod;
 
     // Keep a list of registered address patterns and the methods they're associated with just like addresses
-    internal int PatternCount;
-    internal Regex[] Patterns = new Regex[k_DefaultPatternCapacity];
-    internal OscActionPair[] PatternMethods = new OscActionPair[k_DefaultPatternCapacity];
+    internal int _patternCount;
+    internal Regex[] _patterns = new Regex[DefaultPatternCapacity];
+    internal OscActionPair[] _patternMethods = new OscActionPair[DefaultPatternCapacity];
 
-    readonly Queue<int> FreedPatternIndices = new Queue<int>();
-    readonly Dictionary<string, int> PatternStringToIndex = new Dictionary<string, int>();
+    readonly Queue<int> _freedPatternIndices = new Queue<int>();
+    readonly Dictionary<string, int> _patternStringToIndex = new Dictionary<string, int>();
 
-    public int HandlerCount => AddressToMethod.HandleToValue.Count;
+    public int HandlerCount => _addressToMethod.HandleToValue.Count;
 
-    public IEnumerable<string> Addresses => AddressToMethod.SourceToBlob.Keys;
+    public IEnumerable<string> Addresses => _addressToMethod._sourceToBlob.Keys;
 
-    public OscAddressSpace(int startingCapacity = k_DefaultCapacity)
+    public OscAddressSpace(int startingCapacity = DefaultCapacity)
     {
-        AddressToMethod = new OscAddressMethods(startingCapacity);
+        _addressToMethod = new OscAddressMethods(startingCapacity);
     }
 
     public bool TryAddMethod(string address, OscActionPair onReceived)
@@ -36,36 +36,36 @@ public sealed class OscAddressSpace
         switch (OscParser.GetAddressType(address))
         {
             case AddressType.Address:
-                AddressToMethod.Add(address, onReceived);
+                _addressToMethod.Add(address, onReceived);
                 return true;
             case AddressType.Pattern:
                 int index;
                 // if a method has already been registered for this pattern, add the new delegate
-                if (PatternStringToIndex.TryGetValue(address, out index))
+                if (_patternStringToIndex.TryGetValue(address, out index))
                 {
-                    PatternMethods[index] += onReceived;
+                    _patternMethods[index] += onReceived;
                     return true;
                 }
 
-                if (FreedPatternIndices.Count > 0)
+                if (_freedPatternIndices.Count > 0)
                 {
-                    index = FreedPatternIndices.Dequeue();
+                    index = _freedPatternIndices.Dequeue();
                 }
                 else
                 {
-                    index = PatternCount;
-                    if (index >= Patterns.Length)
+                    index = _patternCount;
+                    if (index >= _patterns.Length)
                     {
-                        var newSize = Patterns.Length * 2;
-                        Array.Resize(ref Patterns, newSize);
-                        Array.Resize(ref PatternMethods, newSize);
+                        var newSize = _patterns.Length * 2;
+                        Array.Resize(ref _patterns, newSize);
+                        Array.Resize(ref _patternMethods, newSize);
                     }
                 }
 
-                Patterns[index] = new Regex(address);
-                PatternMethods[index] = onReceived;
-                PatternStringToIndex[address] = index;
-                PatternCount++;
+                _patterns[index] = new Regex(address);
+                _patternMethods[index] = onReceived;
+                _patternStringToIndex[address] = index;
+                _patternCount++;
                 return true;
             default:
                 return false;
@@ -80,7 +80,7 @@ public sealed class OscAddressSpace
         switch (OscParser.GetAddressType(address))
         {
             case AddressType.Address:
-                return AddressToMethod.RemoveAddress(address);
+                return _addressToMethod.RemoveAddress(address);
             default:
                 return false;
         }
@@ -94,25 +94,25 @@ public sealed class OscAddressSpace
         switch (OscParser.GetAddressType(address))
         {
             case AddressType.Address:
-                return AddressToMethod.Remove(address, onReceived);
+                return _addressToMethod.Remove(address, onReceived);
             case AddressType.Pattern:
-                if (!PatternStringToIndex.TryGetValue(address, out var patternIndex))
+                if (!_patternStringToIndex.TryGetValue(address, out var patternIndex))
                     return false;
 
-                var method = PatternMethods[patternIndex].ValueRead;
+                var method = _patternMethods[patternIndex].ValueRead;
                 if (method.GetInvocationList().Length == 1)
                 {
-                    Patterns[patternIndex] = null!;
-                    PatternMethods[patternIndex] = null!;
+                    _patterns[patternIndex] = null!;
+                    _patternMethods[patternIndex] = null!;
                 }
                 else
                 {
-                    PatternMethods[patternIndex] -= onReceived;
+                    _patternMethods[patternIndex] -= onReceived;
                 }
 
-                PatternCount--;
-                FreedPatternIndices.Enqueue(patternIndex);
-                return PatternStringToIndex.Remove(address);
+                _patternCount--;
+                _freedPatternIndices.Enqueue(patternIndex);
+                return _patternStringToIndex.Remove(address);
             default:
                 return false;
         }
@@ -133,12 +133,12 @@ public sealed class OscAddressSpace
         allMatchedMethods.Clear();
 
         bool any = false;
-        for (var i = 0; i < PatternCount; i++)
+        for (var i = 0; i < _patternCount; i++)
         {
-            if (Patterns[i].IsMatch(address))
+            if (_patterns[i].IsMatch(address))
             {
-                var handler = PatternMethods[i];
-                AddressToMethod.Add(address, handler);
+                var handler = _patternMethods[i];
+                _addressToMethod.Add(address, handler);
                 any = true;
             }
         }

@@ -12,25 +12,25 @@ namespace BuildSoft.OscCore;
 public sealed unsafe class OscServer : IDisposable
 {
     // used to allow easy removal of single callbacks
-    static readonly Dictionary<Action<OscMessageValues>, OscActionPair> k_SingleCallbackToPair =
+    static readonly Dictionary<Action<OscMessageValues>, OscActionPair> _singleCallbackToPair =
         new Dictionary<Action<OscMessageValues>, OscActionPair>();
 
-    readonly OscSocket m_Socket;
-    bool m_Disposed;
-    bool m_Started;
+    readonly OscSocket _socket;
+    bool _disposed;
+    bool _started;
 
-    readonly byte[] m_ReadBuffer;
-    GCHandle m_BufferHandle;
-    byte* m_BufferPtr;
+    readonly byte[] _readBuffer;
+    GCHandle _bufferHandle;
+    readonly byte* _bufferPtr;
 
-    Action?[] m_MainThreadQueue = new Action[16];
-    int m_MainThreadCount;
+    Action?[] _mainThreadQueue = new Action[16];
+    int _mainThreadCount;
 
-    readonly Dictionary<int, string> m_ByteLengthToStringBuffer = new Dictionary<int, string>();
+    readonly Dictionary<int, string> _byteLengthToStringBuffer = new Dictionary<int, string>();
 
-    readonly HashSet<MonitorCallback> m_MonitorCallbacks = new HashSet<MonitorCallback>();
+    readonly HashSet<MonitorCallback> _monitorCallbacks = new HashSet<MonitorCallback>();
 
-    readonly List<OscActionPair> m_PatternMatchedMethods = new List<OscActionPair>();
+    readonly List<OscActionPair> _patternMatchedMethods = new List<OscActionPair>();
 
     internal bool Running { get; set; }
 
@@ -50,32 +50,32 @@ public sealed unsafe class OscServer : IDisposable
             throw new ArgumentException($"port {port} is already in use, cannot start a new OSC Server on it", nameof(port));
         }
 
-        k_SingleCallbackToPair.Clear();
+        _singleCallbackToPair.Clear();
         AddressSpace = new OscAddressSpace();
 
-        m_ReadBuffer = new byte[bufferSize];
-        m_BufferHandle = GCHandle.Alloc(m_ReadBuffer, GCHandleType.Pinned);
-        m_BufferPtr = (byte*)m_BufferHandle.AddrOfPinnedObject();
-        Parser = new OscParser(m_ReadBuffer);
+        _readBuffer = new byte[bufferSize];
+        _bufferHandle = GCHandle.Alloc(_readBuffer, GCHandleType.Pinned);
+        _bufferPtr = (byte*)_bufferHandle.AddrOfPinnedObject();
+        Parser = new OscParser(_readBuffer);
 
         Port = port;
-        m_Socket = new OscSocket(port, this);
+        _socket = new OscSocket(port, this);
         Start();
     }
 
     public void Start()
     {
         // make sure redundant calls don't do anything after the first
-        if (m_Started)
+        if (_started)
         {
             Running = true;
             return;
         }
 
-        m_Socket.Start();
+        _socket.Start();
 
-        m_Disposed = false;
-        m_Started = true;
+        _disposed = false;
+        _started = true;
         Running = true;
     }
 
@@ -120,7 +120,7 @@ public sealed unsafe class OscServer : IDisposable
     public bool TryAddMethod(string address, Action<OscMessageValues> valueReadMethod)
     {
         var pair = new OscActionPair(valueReadMethod);
-        k_SingleCallbackToPair.Add(valueReadMethod, pair);
+        _singleCallbackToPair.Add(valueReadMethod, pair);
         return AddressSpace.TryAddMethod(address, pair);
     }
 
@@ -134,10 +134,10 @@ public sealed unsafe class OscServer : IDisposable
     /// <returns>True if the method was removed from this address, false otherwise</returns>
     public bool RemoveMethod(string address, Action<OscMessageValues> valueReadMethod)
     {
-        if (k_SingleCallbackToPair.TryGetValue(valueReadMethod, out var pair))
+        if (_singleCallbackToPair.TryGetValue(valueReadMethod, out var pair))
         {
             return AddressSpace.RemoveMethod(address, pair) &&
-                    k_SingleCallbackToPair.Remove(valueReadMethod);
+                    _singleCallbackToPair.Remove(valueReadMethod);
         }
 
         return false;
@@ -188,25 +188,25 @@ public sealed unsafe class OscServer : IDisposable
     /// <param name="callback">The method to invoke</param>
     public void AddMonitorCallback(MonitorCallback callback)
     {
-        m_MonitorCallbacks.Add(callback);
+        _monitorCallbacks.Add(callback);
     }
 
     /// <summary>Remove a monitor method</summary>
     /// <param name="callback">The method to remove</param>
     public bool RemoveMonitorCallback(MonitorCallback callback)
     {
-        return m_MonitorCallbacks.Remove(callback);
+        return _monitorCallbacks.Remove(callback);
     }
 
     /// <summary>Must be called on the main thread every frame to handle queued events</summary>
     public void Update()
     {
-        for (int i = 0; i < m_MainThreadCount; i++)
+        for (int i = 0; i < _mainThreadCount; i++)
         {
-            m_MainThreadQueue[i]?.Invoke();
+            _mainThreadQueue[i]?.Invoke();
         }
 
-        m_MainThreadCount = 0;
+        _mainThreadCount = 0;
     }
 
     /// <summary>
@@ -216,10 +216,10 @@ public sealed unsafe class OscServer : IDisposable
     /// <param name="byteLength">The length of the received message</param>
     public void ParseBuffer(int byteLength)
     {
-        var bufferPtr = Parser.BufferPtr;
-        var bufferLongPtr = Parser.BufferLongPtr;
+        var bufferPtr = Parser._bufferPtr;
+        var bufferLongPtr = Parser._bufferLongPtr;
         var parser = Parser;
-        var addressToMethod = AddressSpace.AddressToMethod;
+        var addressToMethod = AddressSpace._addressToMethod;
 
         // determine if the message is a bundle or not 
         if (*bufferLongPtr != Constant.BundlePrefixLong)
@@ -236,12 +236,12 @@ public sealed unsafe class OscServer : IDisposable
             {
                 HandleCallbacks(methodPair, parser.MessageValues);
             }
-            else if (AddressSpace.PatternCount > 0)
+            else if (AddressSpace._patternCount > 0)
             {
                 TryMatchPatterns(parser, bufferPtr, addressLength);
             }
 
-            if (m_MonitorCallbacks.Count > 0)
+            if (_monitorCallbacks.Count > 0)
                 HandleMonitorCallbacks(bufferPtr, addressLength, parser);
 
             return;
@@ -288,14 +288,14 @@ public sealed unsafe class OscServer : IDisposable
                     HandleCallbacks(bundleMethodPair, parser.MessageValues);
                 }
                 // if we have no handler for this exact address, we may have a pattern that matches it
-                else if (AddressSpace.PatternCount > 0)
+                else if (AddressSpace._patternCount > 0)
                 {
                     TryMatchPatterns(parser, bufferPtr, bundleAddressLength);
                 }
 
                 MessageOffset += messageSize + 4;
 
-                if (m_MonitorCallbacks.Count > 0)
+                if (_monitorCallbacks.Count > 0)
                     HandleMonitorCallbacks(contentPtr, bundleAddressLength, parser);
             }
         }
@@ -311,10 +311,10 @@ public sealed unsafe class OscServer : IDisposable
         // if there's a main thread method, queue it
         if (pair.MainThreadQueued != null)
         {
-            if (m_MainThreadCount >= m_MainThreadQueue.Length)
-                Array.Resize(ref m_MainThreadQueue, m_MainThreadCount + 16);
+            if (_mainThreadCount >= _mainThreadQueue.Length)
+                Array.Resize(ref _mainThreadQueue, _mainThreadCount + 16);
 
-            m_MainThreadQueue[m_MainThreadCount++] = pair.MainThreadQueued;
+            _mainThreadQueue[_mainThreadCount++] = pair.MainThreadQueued;
         }
     }
 
@@ -322,7 +322,7 @@ public sealed unsafe class OscServer : IDisposable
     {
         // handle monitor callbacks
         var monitorAddressStr = new BlobString(bufferPtr, addressLength);
-        foreach (var callback in m_MonitorCallbacks)
+        foreach (var callback in _monitorCallbacks)
             callback(monitorAddressStr, parser.MessageValues);
     }
 
@@ -331,10 +331,10 @@ public sealed unsafe class OscServer : IDisposable
         // to support OSC address patterns, we test unmatched addresses against regular expressions
         // To do that, we need it as a regular string.  We may be able to mutate a previous string, 
         // instead of always allocating a new one
-        if (!m_ByteLengthToStringBuffer.TryGetValue(addressLength, out var stringBuffer))
+        if (!_byteLengthToStringBuffer.TryGetValue(addressLength, out var stringBuffer))
         {
             stringBuffer = Encoding.ASCII.GetString(bufferPtr, addressLength);
-            m_ByteLengthToStringBuffer[addressLength] = stringBuffer;
+            _byteLengthToStringBuffer[addressLength] = stringBuffer;
         }
         else
         {
@@ -342,14 +342,14 @@ public sealed unsafe class OscServer : IDisposable
             OverwriteAsciiString(stringBuffer, bufferPtr);
         }
 
-        if (AddressSpace.TryMatchPatternHandler(stringBuffer, m_PatternMatchedMethods))
+        if (AddressSpace.TryMatchPatternHandler(stringBuffer, _patternMatchedMethods))
         {
             var bufferCopy = string.Copy(stringBuffer);
-            AddressSpace.AddressToMethod.Add(bufferCopy, m_PatternMatchedMethods);
-            foreach (var matchedMethod in m_PatternMatchedMethods)
+            AddressSpace._addressToMethod.Add(bufferCopy, _patternMatchedMethods);
+            foreach (var matchedMethod in _patternMatchedMethods)
             {
                 matchedMethod.ValueRead(parser.MessageValues);
-                m_MainThreadQueue[m_MainThreadCount++] = matchedMethod.MainThreadQueued;
+                _mainThreadQueue[_mainThreadCount++] = matchedMethod.MainThreadQueued;
             }
         }
     }
@@ -368,12 +368,12 @@ public sealed unsafe class OscServer : IDisposable
     {
         PortToServer.Remove(Port);
 
-        if (m_Disposed) return;
-        m_Disposed = true;
+        if (_disposed) return;
+        _disposed = true;
 
-        if (m_BufferHandle.IsAllocated) m_BufferHandle.Free();
-        AddressSpace.AddressToMethod.Dispose();
-        m_Socket.Dispose();
+        if (_bufferHandle.IsAllocated) _bufferHandle.Free();
+        AddressSpace._addressToMethod.Dispose();
+        _socket.Dispose();
     }
 
     ~OscServer()
@@ -383,6 +383,6 @@ public sealed unsafe class OscServer : IDisposable
 
     public int CountHandlers()
     {
-        return AddressSpace?.AddressToMethod.SourceToBlob.Count ?? 0;
+        return AddressSpace?._addressToMethod._sourceToBlob.Count ?? 0;
     }
 }

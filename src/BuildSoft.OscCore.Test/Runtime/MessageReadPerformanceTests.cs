@@ -71,8 +71,8 @@ public class MessageReadPerformanceTests
         var values = new OscMessageValues(bytes, count);
         for (int i = 0; i < count; i++)
         {
-            values.Offsets[i] = i * byteSize;
-            values.Tags[i] = tag;
+            values._offsets[i] = i * byteSize;
+            values._tags[i] = tag;
         }
 
         values.ElementCount = count;

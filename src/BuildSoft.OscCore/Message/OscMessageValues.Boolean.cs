@@ -13,9 +13,9 @@ public sealed partial class OscMessageValues
     public bool ReadBooleanElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        return Tags[index] switch
+        return _tags[index] switch
         {
             TypeTag.True => true,
             TypeTag.False => false,

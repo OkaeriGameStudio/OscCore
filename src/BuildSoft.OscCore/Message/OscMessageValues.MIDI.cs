@@ -14,12 +14,12 @@ public sealed unsafe partial class OscMessageValues
     public MidiMessage ReadMidiElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        switch (Tags[index])
+        switch (_tags[index])
         {
             case TypeTag.MIDI:
-                return *(MidiMessage*)(SharedBufferPtr + Offsets[index]);
+                return *(MidiMessage*)(_sharedBufferPtr + _offsets[index]);
             default:
                 return default;
         }
@@ -36,8 +36,8 @@ public sealed unsafe partial class OscMessageValues
     public MidiMessage ReadMidiElementUnchecked(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        return *(MidiMessage*)(SharedBufferPtr + Offsets[index]);
+        return *(MidiMessage*)(_sharedBufferPtr + _offsets[index]);
     }
 }

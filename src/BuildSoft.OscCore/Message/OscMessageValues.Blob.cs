@@ -5,7 +5,7 @@ namespace BuildSoft.OscCore;
 
 public sealed unsafe partial class OscMessageValues
 {
-    const int k_ResizeByteHeadroom = 1024;
+    const int ResizeByteHeadroom = 1024;
 
     /// <summary>
     /// Read a blob element.
@@ -22,18 +22,18 @@ public sealed unsafe partial class OscMessageValues
     public int ReadBlobElement(int index, ref byte[] copyTo, int copyOffset = 0)
     {
 #if OSCCORE_SAFETY_CHECKS
-            if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return default;
 #endif
-        switch (Tags[index])
+        switch (_tags[index])
         {
             case TypeTag.Blob:
-                var offset = Offsets[index];
+                var offset = _offsets[index];
                 var size = ReadIntIndex(offset);
                 var dataStart = offset + 4;    // skip the size int
                 if (copyTo.Length - copyOffset <= size)
-                    Array.Resize(ref copyTo, size + copyOffset + k_ResizeByteHeadroom);
+                    Array.Resize(ref copyTo, size + copyOffset + ResizeByteHeadroom);
 
-                Buffer.BlockCopy(m_SharedBuffer, dataStart, copyTo, copyOffset, size);
+                Buffer.BlockCopy(_sharedBuffer, dataStart, copyTo, copyOffset, size);
                 return size;
             default:
                 return default;

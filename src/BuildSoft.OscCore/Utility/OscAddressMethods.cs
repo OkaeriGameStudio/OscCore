@@ -9,7 +9,7 @@ namespace BuildSoft.OscCore;
 /// <summary>Maps from OSC address to the delegates associated with it</summary>
 internal sealed unsafe class OscAddressMethods : IDisposable
 {
-    const int defaultSize = 16;
+    const int DefaultSize = 16;
 
     /// <summary>
     /// Map from the unmanaged representation of an OSC address to the delegates associated with it
@@ -19,12 +19,12 @@ internal sealed unsafe class OscAddressMethods : IDisposable
     /// <summary>
     /// Map from the source string of an OSC address to the unmanaged representation
     /// </summary>
-    internal readonly Dictionary<string, BlobString> SourceToBlob;
+    internal readonly Dictionary<string, BlobString> _sourceToBlob;
 
-    public OscAddressMethods(int initialCapacity = defaultSize)
+    public OscAddressMethods(int initialCapacity = DefaultSize)
     {
         HandleToValue = new Dictionary<BlobHandle, OscActionPair>(initialCapacity);
-        SourceToBlob = new Dictionary<string, BlobString>(initialCapacity);
+        _sourceToBlob = new Dictionary<string, BlobString>(initialCapacity);
     }
 
     /// <summary>Adds a callback to be executed when a message is received at the address</summary>
@@ -33,11 +33,11 @@ internal sealed unsafe class OscAddressMethods : IDisposable
     [Il2CppSetOption(Option.NullChecks, false)]
     public void Add(string address, OscActionPair callbacks)
     {
-        if (!SourceToBlob.TryGetValue(address, out var blobStr))
+        if (!_sourceToBlob.TryGetValue(address, out var blobStr))
         {
             blobStr = new BlobString(address);
             HandleToValue[blobStr.Handle] = callbacks;
-            SourceToBlob.Add(address, blobStr);
+            _sourceToBlob.Add(address, blobStr);
         }
         else
         {
@@ -80,7 +80,7 @@ internal sealed unsafe class OscAddressMethods : IDisposable
     [Il2CppSetOption(Option.NullChecks, false)]
     public bool Remove(string address, OscActionPair callbacks)
     {
-        if (!SourceToBlob.TryGetValue(address, out var blobStr))
+        if (!_sourceToBlob.TryGetValue(address, out var blobStr))
             return false;
         if (!HandleToValue.TryGetValue(blobStr.Handle, out var existingPair))
             return false;
@@ -88,7 +88,7 @@ internal sealed unsafe class OscAddressMethods : IDisposable
         var valueReadMethod = existingPair.ValueRead;
         if (valueReadMethod.GetInvocationList().Length == 1)
         {
-            var removed = HandleToValue.Remove(blobStr.Handle) && SourceToBlob.Remove(address);
+            var removed = HandleToValue.Remove(blobStr.Handle) && _sourceToBlob.Remove(address);
             blobStr.Dispose();
             return removed;
         }
@@ -102,10 +102,10 @@ internal sealed unsafe class OscAddressMethods : IDisposable
     /// <returns>True if the address was found and removed, false otherwise</returns>
     public bool RemoveAddress(string address)
     {
-        if (!SourceToBlob.TryGetValue(address, out var blobStr))
+        if (!_sourceToBlob.TryGetValue(address, out var blobStr))
             return false;
 
-        SourceToBlob.Remove(address);
+        _sourceToBlob.Remove(address);
         HandleToValue.Remove(blobStr.Handle);
         blobStr.Dispose();
         return true;
@@ -121,12 +121,12 @@ internal sealed unsafe class OscAddressMethods : IDisposable
     public void Clear()
     {
         HandleToValue.Clear();
-        SourceToBlob.Clear();
+        _sourceToBlob.Clear();
     }
 
     public void Dispose()
     {
-        foreach (var kvp in SourceToBlob)
+        foreach (var kvp in _sourceToBlob)
             kvp.Value.Dispose();
     }
 }
