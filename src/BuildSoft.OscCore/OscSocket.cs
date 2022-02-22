@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace BuildSoft.OscCore;
 
 sealed class OscSocket : IDisposable
 {
     readonly Socket m_Socket;
-    readonly Thread m_Thread;
+    readonly Task _task;
     bool m_Disposed;
     bool m_Started;
 
@@ -19,7 +19,7 @@ sealed class OscSocket : IDisposable
     {
         Port = port;
         m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp) { ReceiveTimeout = int.MaxValue };
-        m_Thread = new Thread(Serve);
+        _task = new Task(Serve);
         Server = server;
     }
 
@@ -32,7 +32,7 @@ sealed class OscSocket : IDisposable
         if (!m_Socket.IsBound)
             m_Socket.Bind(new IPEndPoint(IPAddress.Any, Port));
 
-        m_Thread.Start();
+        _task.Start();
         m_Started = true;
     }
 
@@ -55,7 +55,6 @@ sealed class OscSocket : IDisposable
             }
             // a read timeout can result in a socket exception, should just be ok to ignore
             catch (SocketException) { }
-            catch (ThreadAbortException) { }
             catch (Exception)
             {
                 if (!m_Disposed) throw;
