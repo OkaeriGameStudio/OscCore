@@ -16,4 +16,4 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM.
 
 [assembly: Guid("93c729a6-f5b4-49ac-b6d4-c3e135f40dd7")]
-[assembly: InternalsVisibleTo("BuildSoft.OscCore.Runtime.Test")]
+[assembly: InternalsVisibleTo("BuildSoft.OscCore.Test")]

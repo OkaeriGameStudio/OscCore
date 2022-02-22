@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>BuildSoft.OscCore.Runtime</name>
+        <name>BuildSoft.OscCore</name>
     </assembly>
     <members>
         <member name="T:BuildSoft.OscCore.TypeTag">

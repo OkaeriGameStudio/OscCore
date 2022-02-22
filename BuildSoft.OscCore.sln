@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32127.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildSoft.OscCore.Runtime", "src\BuildSoft.OscCore.Runtime\BuildSoft.OscCore.Runtime.csproj", "{6E2BF232-250B-44AD-A979-F175F38FB48D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildSoft.OscCore.Runtime", "src\BuildSoft.OscCore\BuildSoft.OscCore.csproj", "{6E2BF232-250B-44AD-A979-F175F38FB48D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildSoft.OscCore.Runtime.Test", "src\BuildSoft.OscCore.Runtime.Test\BuildSoft.OscCore.Runtime.Test.csproj", "{6D5E99D6-08B8-4E88-9420-46F1FB73EC0A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildSoft.OscCore.Runtime.Test", "src\BuildSoft.OscCore.Test\BuildSoft.OscCore.Test.csproj", "{6D5E99D6-08B8-4E88-9420-46F1FB73EC0A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6E2BF232-250B-44AD-A979-F175F38FB48D} = {6E2BF232-250B-44AD-A979-F175F38FB48D}
 	EndProjectSection

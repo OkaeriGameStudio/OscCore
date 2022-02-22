@@ -8,7 +8,7 @@
 	<RootNamespace>BuildSoft.OscCore</RootNamespace>
 	<BaseOutputPath>..\..\bin</BaseOutputPath>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
-	<DocumentationFile>..\..\docs\xml\BuildSoft.OscCore.Runtime.xml</DocumentationFile>
+	<DocumentationFile>..\..\docs\xml\$(AssemblyName).xml</DocumentationFile>
 
     <PackageId>BuildSoft.OscCore</PackageId>
     <Version>1.0.2</Version>

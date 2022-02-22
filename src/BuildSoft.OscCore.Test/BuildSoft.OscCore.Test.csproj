@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildSoft.OscCore.Runtime\BuildSoft.OscCore.Runtime.csproj" />
+    <ProjectReference Include="..\BuildSoft.OscCore\BuildSoft.OscCore.csproj" />
   </ItemGroup>
 
 </Project>
