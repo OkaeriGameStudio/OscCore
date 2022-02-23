@@ -78,6 +78,13 @@
             <summary>Execute a method for every element in the message</summary>
             <param name="elementAction">A method that takes in the index and type tag for an element</param>
         </member>
+        <member name="M:BuildSoft.OscCore.OscMessageValues.GetTypeTag(System.Int32)">
+            <summary>
+            Get a <see cref="T:BuildSoft.OscCore.TypeTag"/> corresponding to <paramref name="index"/>.
+            </summary>
+            <param name="index">Index of <see cref="T:BuildSoft.OscCore.TypeTag"/> you want to get</param>
+            <returns></returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadFloatElement(System.Int32)">
             <summary>
             Read a single 32-bit float message element.

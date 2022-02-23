@@ -77,6 +77,19 @@ public sealed unsafe partial class OscMessageValues
             elementAction(i, _tags[i]);
     }
 
+    /// <summary>
+    /// Get a <see cref="TypeTag"/> corresponding to <paramref name="index"/>.
+    /// </summary>
+    /// <param name="index">Index of <see cref="TypeTag"/> you want to get</param>
+    /// <returns></returns>
+    public TypeTag GetTypeTag(int index)
+    {
+#if OSCCORE_SAFETY_CHECKS
+        if (OutOfBounds(index)) return default;
+#endif
+        return _tags[index];
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool OutOfBounds(int index)
     {
