@@ -5,7 +5,7 @@ namespace BuildSoft.OscCore;
 public sealed partial class OscMessageValues
 {
     /// <summary>
-    /// Checks the element type before reading and returns default if it's not interpretable as a boolean.
+    /// Checks the element type before reading and throw <see cref="InvalidOperationException"/> if it's not interpretable as a boolean.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
@@ -20,7 +20,7 @@ public sealed partial class OscMessageValues
             TypeTag.True => true,
             TypeTag.False => false,
             TypeTag.Int32 => ReadIntElementUnchecked(index) > 0,
-            _ => default,
+            _ => throw new InvalidOperationException(),
         };
     }
 }

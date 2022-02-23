@@ -17,7 +17,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadAsciiCharElement(System.Int32)">
             <summary>
             Read a non-standard ascii char element.
-            Checks the element type before reading and returns default if it does not have the 'c' type tag
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it does not have the 'c' type tag
             </summary>
             <param name="index">The element index</param>
             <returns>The character value if the element has the right type tag, default otherwise</returns>
@@ -25,7 +25,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadBlobElement(System.Int32,System.Byte[]@,System.Int32)">
             <summary>
             Read a blob element.
-            Checks the element type before reading, and does nothing if the element is not a blob.
+            Checks the element type before reading, and throw <see cref="T:System.InvalidOperationException"/> if the element is not a blob.
             </summary>
             <param name="index">The element index</param>
             <param name="copyTo">
@@ -33,11 +33,11 @@
             Will be resized if it lacks sufficient capacity
             </param>
             <param name="copyOffset">The index in the copyTo array to start copying at</param>
-            <returns>The size of the blob if valid, 0 otherwise</returns>
+            <returns>The size of the blob</returns>
         </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadBooleanElement(System.Int32)">
             <summary>
-            Checks the element type before reading and returns default if it's not interpretable as a boolean.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a boolean.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -45,7 +45,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadColor32Element(System.Int32)">
             <summary>
             Read a single 32-bit RGBA color message element.
-            Checks the element type before reading and returns default if it's not interpretable as a color.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a color.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -88,7 +88,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadFloatElement(System.Int32)">
             <summary>
             Read a single 32-bit float message element.
-            Checks the element type before reading and returns 0 if it's not interpretable as a float.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a float.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -105,7 +105,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadFloat64Element(System.Int32)">
             <summary>
             Read a single 64-bit float (double) message element.
-            Checks the element type before reading and returns 0 if it's not interpretable as a double.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a double.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -122,7 +122,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadIntElement(System.Int32)">
             <summary>
             Read a single 32-bit integer message element.
-            Checks the element type before reading and returns 0 if it's not interpretable as a integer.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a integer.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -139,7 +139,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadInt64Element(System.Int32)">
             <summary>
             Read a single 64-bit integer (long) message element.
-            Checks the element type before reading and returns 0 if it's not interpretable as a long.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a long.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -156,7 +156,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadMidiElement(System.Int32)">
             <summary>
             Read a single MIDI message element.
-            Checks the element type before reading and returns default if it's not interpretable as a MIDI message.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a MIDI message.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -180,7 +180,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadStringElement(System.Int32)">
             <summary>
             Read a single string message element.
-            Checks the element type before reading and returns empty if it's not interpretable as a string.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a string.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -205,7 +205,7 @@
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadTimestampElement(System.Int32)">
             <summary>
             Read a single NTP timestamp message element.
-            Checks the element type before reading and returns 0 if it's not interpretable as a integer.
+            Checks the element type before reading and throw <see cref="T:System.InvalidOperationException"/> if it's not interpretable as a integer.
             </summary>
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
@@ -390,6 +390,8 @@
             Add a background thread read callback and main thread callback associated with an OSC address.
             </summary>
             <param name="address">The OSC address to associate a method with</param>
+            <param name="read"></param>
+            <param name="mainThread"></param>
             <returns>True if the address was valid and methods associated with it, false otherwise</returns>
         </member>
         <member name="M:BuildSoft.OscCore.OscServer.RemoveMethodPair(System.String,BuildSoft.OscCore.OscActionPair)">

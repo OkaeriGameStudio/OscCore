@@ -9,7 +9,7 @@ public sealed unsafe partial class OscMessageValues
 
     /// <summary>
     /// Read a blob element.
-    /// Checks the element type before reading, and does nothing if the element is not a blob.
+    /// Checks the element type before reading, and throw <see cref="InvalidOperationException"/> if the element is not a blob.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <param name="copyTo">
@@ -17,7 +17,7 @@ public sealed unsafe partial class OscMessageValues
     /// Will be resized if it lacks sufficient capacity
     /// </param>
     /// <param name="copyOffset">The index in the copyTo array to start copying at</param>
-    /// <returns>The size of the blob if valid, 0 otherwise</returns>
+    /// <returns>The size of the blob</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int ReadBlobElement(int index, ref byte[] copyTo, int copyOffset = 0)
     {
@@ -36,7 +36,7 @@ public sealed unsafe partial class OscMessageValues
                 Buffer.BlockCopy(_sharedBuffer, dataStart, copyTo, copyOffset, size);
                 return size;
             default:
-                return default;
+                throw new InvalidOperationException();
         }
     }
 

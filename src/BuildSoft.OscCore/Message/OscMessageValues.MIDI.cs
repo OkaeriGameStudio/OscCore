@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace BuildSoft.OscCore;
 
@@ -6,7 +7,7 @@ public sealed unsafe partial class OscMessageValues
 {
     /// <summary>
     /// Read a single MIDI message element.
-    /// Checks the element type before reading and returns default if it's not interpretable as a MIDI message.
+    /// Checks the element type before reading and throw <see cref="InvalidOperationException"/> if it's not interpretable as a MIDI message.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
@@ -21,7 +22,7 @@ public sealed unsafe partial class OscMessageValues
             case TypeTag.MIDI:
                 return *(MidiMessage*)(_sharedBufferPtr + _offsets[index]);
             default:
-                return default;
+                throw new InvalidOperationException();
         }
     }
 

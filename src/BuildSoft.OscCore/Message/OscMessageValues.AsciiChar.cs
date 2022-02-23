@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace BuildSoft.OscCore;
 
@@ -6,7 +7,7 @@ public sealed partial class OscMessageValues
 {
     /// <summary>
     /// Read a non-standard ascii char element.
-    /// Checks the element type before reading and returns default if it does not have the 'c' type tag
+    /// Checks the element type before reading and throw <see cref="InvalidOperationException"/> if it does not have the 'c' type tag
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The character value if the element has the right type tag, default otherwise</returns>
@@ -20,7 +21,7 @@ public sealed partial class OscMessageValues
         {
             // the ascii byte is placed at the end of the 4 bytes given for an element
             TypeTag.AsciiChar32 => (char)_sharedBuffer[_offsets[index] + 3],
-            _ => default,
+            _ => throw new InvalidOperationException(),
         };
     }
 }

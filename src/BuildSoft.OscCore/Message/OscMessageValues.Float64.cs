@@ -7,7 +7,7 @@ public sealed unsafe partial class OscMessageValues
 {
     /// <summary>
     /// Read a single 64-bit float (double) message element.
-    /// Checks the element type before reading and returns 0 if it's not interpretable as a double.
+    /// Checks the element type before reading and throw <see cref="InvalidOperationException"/> if it's not interpretable as a double.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
@@ -45,7 +45,7 @@ public sealed unsafe partial class OscMessageValues
                        _sharedBuffer[index + 3];
         }
 
-        return default;
+        throw new InvalidOperationException();
     }
 
     /// <summary>

@@ -9,7 +9,7 @@ public sealed unsafe partial class OscMessageValues
 {
     /// <summary>
     /// Read a single string message element.
-    /// Checks the element type before reading and returns empty if it's not interpretable as a string.
+    /// Checks the element type before reading and throw <see cref="InvalidOperationException"/> if it's not interpretable as a string.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
@@ -76,7 +76,7 @@ public sealed unsafe partial class OscMessageValues
                 // ascii chars are encoded in the last byte of the 4-byte block
                 return ((char)_sharedBuffer[offset + 3]).ToString();
             default:
-                return string.Empty;
+                throw new InvalidOperationException();
         }
     }
 
@@ -106,7 +106,7 @@ public sealed unsafe partial class OscMessageValues
                 }
                 return i - offset;
             default:
-                return default;
+                throw new InvalidOperationException();
         }
     }
 
@@ -140,7 +140,7 @@ public sealed unsafe partial class OscMessageValues
 
                 return i - offset;
             default:
-                return default;
+                throw new InvalidOperationException();
         }
     }
 }

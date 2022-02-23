@@ -9,6 +9,7 @@
 	<BaseOutputPath>..\..\bin</BaseOutputPath>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<DocumentationFile>..\..\docs\xml\$(AssemblyName).xml</DocumentationFile>
+    <ImplicitUsings>enable</ImplicitUsings>
 
     <PackageId>BuildSoft.OscCore</PackageId>
     <Version>1.0.3</Version>

@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using BuildSoft.OscCore.UnityObjects;
 
 namespace BuildSoft.OscCore;
@@ -7,7 +8,7 @@ public sealed unsafe partial class OscMessageValues
 {
     /// <summary>
     /// Read a single 32-bit RGBA color message element.
-    /// Checks the element type before reading and returns default if it's not interpretable as a color.
+    /// Checks the element type before reading and throw <see cref="InvalidOperationException"/> if it's not interpretable as a color.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
@@ -26,7 +27,7 @@ public sealed unsafe partial class OscMessageValues
                 _swapBuffer32[3] = _sharedBuffer[offset];
                 return *_swapBufferColor32Ptr;
             default:
-                return default;
+                throw new InvalidOperationException();
         }
     }
 

@@ -6,7 +6,7 @@ public sealed unsafe partial class OscMessageValues
 {
     /// <summary>
     /// Read a single NTP timestamp message element.
-    /// Checks the element type before reading and returns 0 if it's not interpretable as a integer.
+    /// Checks the element type before reading and throw <see cref="InvalidOperationException"/> if it's not interpretable as a integer.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
@@ -20,7 +20,7 @@ public sealed unsafe partial class OscMessageValues
             case TypeTag.TimeTag:
                 return NtpTimestamp.FromBigEndianBytes(_sharedBufferPtr + _offsets[index]);
             default:
-                return default;
+                throw new InvalidOperationException();
         }
     }
 
