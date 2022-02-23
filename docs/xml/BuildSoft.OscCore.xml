@@ -22,6 +22,14 @@
             <param name="index">The element index</param>
             <returns>The character value if the element has the right type tag, default otherwise</returns>
         </member>
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadBlobElement(System.Int32)">
+            <summary>
+            Read a blob element.
+            Checks the element type before reading, and throw <see cref="T:System.InvalidOperationException"/> if the element is not a blob.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The array copied blob contents into</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadBlobElement(System.Int32,System.Byte[]@,System.Int32)">
             <summary>
             Read a blob element.
