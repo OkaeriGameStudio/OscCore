@@ -13,10 +13,10 @@ public sealed unsafe partial class OscMessageValues
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
-    public string? ReadStringElement(int index)
+    public string ReadStringElement(int index)
     {
 #if OSCCORE_SAFETY_CHECKS
-        if (OutOfBounds(index)) return default;
+        if (OutOfBounds(index)) return string.Empty;
 #endif
         var offset = _offsets[index];
         switch (_tags[index])
