@@ -1,51 +1,21 @@
 # OscCore
-A performance-oriented OSC ([Open Sound Control](http://opensoundcontrol.org/spec-1_0)) library for Unity
+A performance-oriented OSC ([Open Sound Control](http://opensoundcontrol.org/spec-1_0)) library for .NET.
 
 ## Versions and Platforms
 
-Releases are checked for compatability with the latest release of these versions, and should work with anything in between.
-- **2018.4.x** (LTS)
-- **2019.x** (Official release)
-
-Builds are tested on recent versions of Windows, MacOS, Android, and iOS, using both Mono and IL2CPP runtimes. 
-
-It should work on any platform where you can use `System.Net.Sockets`, but it's not tested on Linux or consoles.
+Releases are checked for compatibility with the latest release of these versions.
+- **.NET Standard 2.1**
 
 ## Installation
 
-Download & import the .unitypackage from the [Releases](https://github.com/stella3d/OscCore/releases) page.
+Download & import the .nupkg from the [Releases](https://github.com/ChanyaVRC/OscCore/releases) page.
 
-I may put this on the [Unity package manager](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@1.8/manual/index.html) eventually, but i haven't yet.
+I can also download from [NuGet Package Manager](https://docs.microsoft.com/nuget/quickstart/install-and-use-a-package-in-visual-studio). 
+See [nuget.org](https://www.nuget.org/packages/BuildSoft.OscCore/) for the NuGet package latest version.
 
 # Usage
 
 ## Receiving messages
-
-### Debug Scene
-
-To test if message receiving is working at runtime in general, you can build the `Runtime Receiver Debug` scene to a player, and it will show you the device's local IP along with a log of received messages..
-
-### Using Components
-
-For a completely set up example, please see the scene `Message Receiving Example`, "Osc Input" object.
-
-To start, add a `OscReceiver` component to a GameObject somewhere.  This component handles listening for all messages on a single port.
-
-Then add a message handler component to that object or any of its children. There are different components for each type of message, all found under `Add Component -> OSC -> Input`.  Message handler components exist for the most common types.
-
-After adding the component, specify an [OSC address](http://opensoundcontrol.org/spec-1_0) to receive at, and hook up the [UnityEvent](https://docs.unity3d.com/Manual/UnityEvents.html) you see in the handler to what you want to do.  
-
-Here's what a receiver and a message handler for a float message look like set up.
-![OSC Receiver Component](https://raw.githubusercontent.com/stella3d/osccore-doc-images/master/oscreceiver_withfloathandler.png)
-
-
-Message handling components will automatically find references to an `OscReceiver` in its parent heirarchy and use that if the reference is not explicitly specified.
-
-###### Under the hood
-
-The `OscServer` instance attached to the receiver component is what will actually handle incoming messages - the component is just a wrapper.  You can use `OscServer` directly in your own scripts. It implements `IDisposable` - just `Dispose()` it to close the underlying socket.
-
-The server must have its `Update()` method ticked to handle main thread queued callbacks. `OscReceiver`handles this for you. 
 
 ### Using Code
 
@@ -59,20 +29,14 @@ You can register a single callback, to be executed on the server's background th
 
 If you have no need to queue a method to be called on the main thread, you probably want this one.
 ```csharp
-class SingleCallbackExample
+var Server = OscServer.GetOrCreate(7000);
+
+// add a single callback that reads message values at `/layers/1/opacity`
+Server.TryAddMethod("/layers/1/opacity", ReadValues);
+
+void ReadValues(OscMessageValues values)
 {
-  OscServer Server { get; set; }      // get the server instance from the OscReceiver component or your own code
-
-  void ReadValues(OscMessageValues values)
-  {
-      // call ReadElement methods here to extract values
-  }
-
-  public SingleCallbackExample()
-  {
-    // add a single callback that reads message values at `/layers/1/opacity`
-    Server.TryAddMethod("/layers/1/opacity", ReadValues);
-  }
+    // call ReadElement methods here to extract values
 }
 ```
 
@@ -85,32 +49,28 @@ These pairs consist of two methods, with the main thread one being optional.
 1) Runs on background thread, immediate execution, just like single methods
 2) Runs on main thread, queued on the next frame
 
-This is useful for invoking UnityEvents on the main thread, or any other use case that needs a main thread api.
+This is useful for invoking events on the main thread, or any other use case that needs a main thread api.
 _Read the message values in the first method._
 
 ```csharp
-class CallbackPairExample
+var server = OscServer.GetOrCreate(7000);
+
+float messageValue = 0.0f;
+
+void ReadValues(OscMessageValues values) 
 {
-  OscServer Server { get; }
-  OscActionPair ActionPair { get; set;}
+    messageValue = values.ReadFloatElement(0);
+}
 
-  float MessageValue;
-
-  void ReadValues(OscMessageValues values) 
-  {
-    MessageValue = values.ReadFloatElement(0);
-  }
-  
-  void MainThreadMethod() 
-  {
+void MainThreadMethod() 
+{
     // do something with MessageValue on the main thread
-  }
+}
 
-  public CallbackPairExample()
-  {
+public CallbackPairExample()
+{
     // add a pair of methods for the OSC address "/layers/2/color/red"
-    Server.TryAddMethodPair("/layers/2/color/red", ReadValues, MainThreadMethod);
-  }
+    server.TryAddMethodPair("/layers/2/color/red", ReadValues, MainThreadMethod);
 }
 ```
 
@@ -133,7 +93,6 @@ int ReadTripleFloatMessage(OscMessageValues values)
     float y  = values.ReadFloatElement(1);
     float z  = values.ReadFloatElement(2);
 }
-
 ```
 
 Most data types offer an `Unchecked` version of the method that is slightly faster, and still safe to use if you know for sure what data type an element is.
@@ -142,50 +101,21 @@ double ReadUncheckedDoubleMessage(OscMessageValues values)
 {
     return values.ReadFloat64ElementUnchecked(0);
 }
-
 ```
 
 ##### Monitor Callbacks
 
-IF you just want to inspect message, you can add a monitor callback to be able to inspect every incoming message.
+If you just want to inspect message, you can add a monitor callback to be able to inspect every incoming message.
 
-A monitor callback is an `Action<BlobString, OscMessageValues>`, where the blob string is the address.  You can look at the [Monitor Window](https://github.com/stella3d/OscCore/blob/master/Editor/MonitorWindow.cs) code for an example.
-
+A monitor callback is an `Action<BlobString, OscMessageValues>`, where the blob string is the address.
 
 ## Sending Messages
 
-### Using Components
-
-For a completely set up example, please see the scene `Property Sender Example`.
-
-Add an `OscSender` component to a GameObject somewhere via the `Add Component` menu, `OSC/OSC Sender`.   
-This component handles the connection to a single OSC endpoint (IP address + port).
-
-Then add a `Property Output` component via the `Add Component` menu, `OSC/Property Output`.  If you create it as a sibling or child of the `OscSender` component, it will automatically detect it.  If not, assign the "Sender" reference on it.
-
-This component lets you pick any public property of a Unity object and automatically send an OSC message with its value when it changes.
-To do so:
-
-1. Assign the GameObject that holds the component you want to get a value from
-2. Pick the component via dropdown
-3. Pick the property via dropdown
-
-It will look like this filled out.
-
-![Property Output Commponent UI](https://raw.githubusercontent.com/stella3d/osccore-doc-images/master/propertyoutput_filled_single.png)
-
-
-There is special support for sending a subset of the elements of a _Vector2_ or _Vector3_.  
-Select from the "Vector elements" dropdown to send other combinations of x,y, & z.
-
-![Vector Element Dropdown](https://raw.githubusercontent.com/stella3d/osccore-doc-images/master/propertyoutput_floatfromvector.png)
-
-
 ### Using Code
 
-[OscWriter](https://github.com/stella3d/OscCore/blob/master/Runtime/Scripts/OscWriter.cs) handles serialization of individual message elements.
+[OscWriter](https://github.com/ChanyaVRC/OscCore/blob/netstandard/all-in-one/src/BuildSoft.OscCore/OscWriter.cs) handles serialization of individual message elements.
 
-[OscClient](https://github.com/stella3d/OscCore/blob/master/Runtime/Scripts/OscClient.cs) wraps a writer and sends whole messages.
+[OscClient](https://github.com/ChanyaVRC/OscCore/blob/netstandard/all-in-one/src/BuildSoft.OscCore/OscClient.cs) wraps a writer and sends whole messages.
 
 Sending of complex messages with multiple elements hasn't been abstracted yet - take a look at the methods in `OscClient` to see how to send any message you need.
 
@@ -258,15 +188,3 @@ Incoming message's addresses are matched directly against their unmanaged ascii 
 This has two benefits 
 - no memory is allocated when a message is received
 - takes less CPU time to parse a message
-
-#### Why Another OSC Library ?
-
-There are at least 4 other OSC implementations for Unity:
-- [OscJack](https://github.com/keijiro/OscJack), which i was using before
-- [ExtOSC](https://github.com/Iam1337/extOSC), [UnityOSC](https://github.com/jorgegarcia/UnityOSC), & [OscSimpl](https://assetstore.unity.com/packages/tools/input-management/osc-simpl-53710)
-
-OscCore was created largely because all of these other libraries _allocate memory for each received message_, which will cause lots of garbage collections when used with a large amount of messages.  For more on this see [performance details](#performance-details).
-
-OscCore aims foremost to be **small** & **fast**, so that other systems can be built on top of it. 
-
-One of the existing libraries may satisfy your needs if you don't need to care much about garbage allocation / performance!
