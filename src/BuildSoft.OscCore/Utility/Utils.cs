@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -37,8 +38,13 @@ static class Utils
         where TData : unmanaged
         where TPtr : unmanaged
     {
+        return (TPtr*)PinPtr(array, out handle);
+    }
+    public static unsafe IntPtr PinPtr<TData>(TData[] array, out GCHandle handle)
+        where TData : unmanaged
+    {
         handle = GCHandle.Alloc(array, GCHandleType.Pinned);
-        return (TPtr*)handle.AddrOfPinnedObject();
+        return handle.AddrOfPinnedObject();
     }
 
     internal static string GetLocalIpAddress()

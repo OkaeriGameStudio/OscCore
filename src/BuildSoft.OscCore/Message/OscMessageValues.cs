@@ -54,8 +54,7 @@ public sealed unsafe partial class OscMessageValues
         fixed (byte* bufferPtr = buffer) { _sharedBufferPtr = bufferPtr; }
 
         // pin byte swap buffers in place, so that we can count on the pointers never changing
-        _swap32Handle = GCHandle.Alloc(_swapBuffer32, GCHandleType.Pinned);
-        var swap32Ptr = _swap32Handle.AddrOfPinnedObject();
+        var swap32Ptr = Utils.PinPtr(_swapBuffer32, out _swap32Handle);
         _swapBuffer32Ptr = (float*)swap32Ptr;
         _swapBuffer32UintPtr = (uint*)swap32Ptr;
         _swapBufferColor32Ptr = (Color32*)(byte*)swap32Ptr;
