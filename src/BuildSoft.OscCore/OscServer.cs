@@ -28,7 +28,7 @@ public sealed unsafe class OscServer : IDisposable
 
     readonly Dictionary<int, string> _byteLengthToStringBuffer = new Dictionary<int, string>();
 
-    readonly HashSet<MonitorCallback> _monitorCallbacks = new HashSet<MonitorCallback>();
+    readonly List<MonitorCallback> _monitorCallbacks = new List<MonitorCallback>();
 
     readonly List<OscActionPair> _patternMatchedMethods = new List<OscActionPair>();
 
