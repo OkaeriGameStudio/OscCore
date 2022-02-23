@@ -14,7 +14,14 @@
             Represents the tags and values associated with a received OSC message
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadAsciiCharElement(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadAsciiCharElement(System.Int32)">
+            <summary>
+            Read a non-standard ascii char element.
+            Checks the element type before reading and returns default if it does not have the 'c' type tag
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The character value if the element has the right type tag, default otherwise</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadBlobElement(System.Int32,System.Byte[]@,System.Int32)">
             <summary>
             Read a blob element.
@@ -28,8 +35,21 @@
             <param name="copyOffset">The index in the copyTo array to start copying at</param>
             <returns>The size of the blob if valid, 0 otherwise</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadBooleanElement(System.Int32)" -->
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadColor32Element(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadBooleanElement(System.Int32)">
+            <summary>
+            Checks the element type before reading and returns default if it's not interpretable as a boolean.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadColor32Element(System.Int32)">
+            <summary>
+            Read a single 32-bit RGBA color message element.
+            Checks the element type before reading and returns default if it's not interpretable as a color.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadColor32ElementUnchecked(System.Int32)">
             <summary>
             Read a single 32-bit RGBA color message element, without checking the type tag of the element.
@@ -58,7 +78,14 @@
             <summary>Execute a method for every element in the message</summary>
             <param name="elementAction">A method that takes in the index and type tag for an element</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadFloatElement(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadFloatElement(System.Int32)">
+            <summary>
+            Read a single 32-bit float message element.
+            Checks the element type before reading and returns 0 if it's not interpretable as a float.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadFloatElementUnchecked(System.Int32)">
             <summary>
             Read a single 32-bit float message element, without checking the type tag of the element.
@@ -68,7 +95,14 @@
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadFloat64Element(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadFloat64Element(System.Int32)">
+            <summary>
+            Read a single 64-bit float (double) message element.
+            Checks the element type before reading and returns 0 if it's not interpretable as a double.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadFloat64ElementUnchecked(System.Int32)">
             <summary>
             Read a single 64-bit float (double) message element, without checking the type tag of the element.
@@ -78,7 +112,14 @@
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadIntElement(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadIntElement(System.Int32)">
+            <summary>
+            Read a single 32-bit integer message element.
+            Checks the element type before reading and returns 0 if it's not interpretable as a integer.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadIntElementUnchecked(System.Int32)">
             <summary>
             Read a single 32-bit int message element, without checking the type tag of the element.
@@ -88,7 +129,14 @@
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadInt64Element(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadInt64Element(System.Int32)">
+            <summary>
+            Read a single 64-bit integer (long) message element.
+            Checks the element type before reading and returns 0 if it's not interpretable as a long.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadInt64ElementUnchecked(System.Int32)">
             <summary>
             Read a single 64-bit integer (long) message element, without checking the type tag of the element.
@@ -98,7 +146,14 @@
             <param name="index">The element index</param>
             <returns>The value of the element</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadMidiElement(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadMidiElement(System.Int32)">
+            <summary>
+            Read a single MIDI message element.
+            Checks the element type before reading and returns default if it's not interpretable as a MIDI message.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadMidiElementUnchecked(System.Int32)">
             <summary>
             Read a single MIDI message element, without checking the type tag of the element.
@@ -115,7 +170,14 @@
             <param name="index">The element index</param>
             <returns>True if the element's type tag is nil or infinitum, false otherwise</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadStringElement(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadStringElement(System.Int32)">
+            <summary>
+            Read a single string message element.
+            Checks the element type before reading and returns empty if it's not interpretable as a string.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadStringElementBytes(System.Int32,System.Byte[])">
             <summary>
             Read a single string message element as bytes.
@@ -133,7 +195,14 @@
             <param name="copyOffset">The index in the copyTo array to start copying at</param>
             <returns>The byte length of the string</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscMessageValues.ReadTimestampElement(System.Int32)" -->
+        <member name="M:BuildSoft.OscCore.OscMessageValues.ReadTimestampElement(System.Int32)">
+            <summary>
+            Read a single NTP timestamp message element.
+            Checks the element type before reading and returns 0 if it's not interpretable as a integer.
+            </summary>
+            <param name="index">The element index</param>
+            <returns>The value of the element</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscMessageValues.ReadTimestampElementUnchecked(System.Int32)">
             <summary>
             Read a single NTP timestamp message element, without checking the type tag of the element.
@@ -301,8 +370,21 @@
             <param name="address">The OSC address to handle messages for</param>
             <returns>True if the method address was found and removed, false otherwise</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscServer.TryAddMethodPair(System.String,BuildSoft.OscCore.OscActionPair)" -->
-        <!-- Badly formed XML comment ignored for member "M:BuildSoft.OscCore.OscServer.TryAddMethodPair(System.String,System.Action{BuildSoft.OscCore.OscMessageValues},System.Action)" -->
+        <member name="M:BuildSoft.OscCore.OscServer.TryAddMethodPair(System.String,BuildSoft.OscCore.OscActionPair)">
+            <summary>
+            Add a background thread read callback and main thread callback associated with an OSC address.
+            </summary>
+            <param name="address">The OSC address to associate a method with</param>
+            <param name="actionPair">The pair of callbacks to add</param>
+            <returns>True if the address was valid and methods associated with it, false otherwise</returns>
+        </member>
+        <member name="M:BuildSoft.OscCore.OscServer.TryAddMethodPair(System.String,System.Action{BuildSoft.OscCore.OscMessageValues},System.Action)">
+            <summary>
+            Add a background thread read callback and main thread callback associated with an OSC address.
+            </summary>
+            <param name="address">The OSC address to associate a method with</param>
+            <returns>True if the address was valid and methods associated with it, false otherwise</returns>
+        </member>
         <member name="M:BuildSoft.OscCore.OscServer.RemoveMethodPair(System.String,BuildSoft.OscCore.OscActionPair)">
             <summary>
             Remove a background thread read callback and main thread callback associated with an OSC address.
@@ -640,7 +722,9 @@
                  }
              </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "T:MiniNtp.NtpTimestamp" -->
+        <member name="T:MiniNtp.NtpTimestamp">
+            <summary>64-bit NTP timestamp as described in RFC-1305 and 5905</summary>
+        </member>
         <member name="F:MiniNtp.NtpTimestamp.Seconds">
             <summary>The number of seconds since the last epoch</summary>
         </member>

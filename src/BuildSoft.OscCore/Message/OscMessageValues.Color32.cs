@@ -7,7 +7,7 @@ public sealed unsafe partial class OscMessageValues
 {
     /// <summary>
     /// Read a single 32-bit RGBA color message element.
-    /// Checks the element type before reading & returns default if it's not interpretable as a color.
+    /// Checks the element type before reading and returns default if it's not interpretable as a color.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>

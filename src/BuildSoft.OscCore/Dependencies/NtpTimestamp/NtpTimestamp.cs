@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace MiniNtp;
 
-/// <summary>64-bit NTP timestamp as described in RFC-1305 & 5905</summary>
+/// <summary>64-bit NTP timestamp as described in RFC-1305 and 5905</summary>
 public struct NtpTimestamp : IEquatable<NtpTimestamp>, IComparable<NtpTimestamp>
 {
     /// <summary>The number of seconds since the last epoch</summary>

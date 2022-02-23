@@ -156,7 +156,7 @@ public sealed unsafe class OscServer : IDisposable
     /// </summary>
     /// <param name="address">The OSC address to associate a method with</param>
     /// <param name="actionPair">The pair of callbacks to add</param>
-    /// <returns>True if the address was valid & methods associated with it, false otherwise</returns>
+    /// <returns>True if the address was valid and methods associated with it, false otherwise</returns>
     public bool TryAddMethodPair(string address, OscActionPair actionPair) =>
         AddressSpace.TryAddMethod(address, actionPair);
 
@@ -164,7 +164,7 @@ public sealed unsafe class OscServer : IDisposable
     /// Add a background thread read callback and main thread callback associated with an OSC address.
     /// </summary>
     /// <param name="address">The OSC address to associate a method with</param>
-    /// <returns>True if the address was valid & methods associated with it, false otherwise</returns>
+    /// <returns>True if the address was valid and methods associated with it, false otherwise</returns>
     public bool TryAddMethodPair(string address, Action<OscMessageValues> read, Action mainThread) =>
         AddressSpace.TryAddMethod(address, new OscActionPair(read, mainThread));
 

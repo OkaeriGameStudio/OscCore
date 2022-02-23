@@ -5,7 +5,7 @@ namespace BuildSoft.OscCore;
 public sealed partial class OscMessageValues
 {
     /// <summary>
-    /// Checks the element type before reading & returns default if it's not interpretable as a boolean.
+    /// Checks the element type before reading and returns default if it's not interpretable as a boolean.
     /// </summary>
     /// <param name="index">The element index</param>
     /// <returns>The value of the element</returns>
