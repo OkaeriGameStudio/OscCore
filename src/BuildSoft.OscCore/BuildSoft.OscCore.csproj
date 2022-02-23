@@ -12,7 +12,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <PackageId>BuildSoft.OscCore</PackageId>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>ChanyaKushima</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageDescription>A performance-oriented OSC library for .NET Standard</PackageDescription>
