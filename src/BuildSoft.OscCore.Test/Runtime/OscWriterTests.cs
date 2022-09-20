@@ -217,7 +217,7 @@ public class OscWriterTests
     {
         var bytes = new byte[count];
         for (int i = 0; i < bytes.Length; i++)
-            bytes[i] = (byte)Random.Shared.Next(0, 255);
+            bytes[i] = (byte)TestUtil.SharedRandom.Next(0, 255);
 
         return bytes;
     }

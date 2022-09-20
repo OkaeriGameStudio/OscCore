@@ -36,10 +36,10 @@ public class MessageReadPerformanceTests
         m_TimeSourceBytes = TestUtil.RandomTimestampBytes(k_Count * 4);
 
         for (int i = 0; i < m_IntSourceData.Length; i++)
-            m_IntSourceData[i] = Random.Shared.Next(-10000, 10000);
+            m_IntSourceData[i] = TestUtil.SharedRandom.Next(-10000, 10000);
 
         for (int i = 0; i < m_FloatSourceData.Length; i++)
-            m_FloatSourceData[i] = Random.Shared.NextSingle() * 200f - 100f;
+            m_FloatSourceData[i] = (float)TestUtil.SharedRandom.NextDouble() * 200f - 100f;
     }
 
     [SetUp]

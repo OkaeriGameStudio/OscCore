@@ -109,9 +109,9 @@ public unsafe struct BlobHandle : IEquatable<BlobHandle>
 
     static int MemoryCompare(void* ptr1, void* ptr2, UIntPtr count)
     {
-        var p1 = new Span<byte>(ptr1, (int)count);
-        var p2 = new Span<byte>(ptr2, (int)count);
-        for (int i = 0; i < p1.Length; i++)
+        var p1 = (byte*)ptr1;
+        var p2 = (byte*)ptr1;
+        for (int i = 0; i < (int)count; i++)
         {
             if (p1[i] != p2[i])
             {
