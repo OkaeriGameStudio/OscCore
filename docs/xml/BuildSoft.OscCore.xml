@@ -253,6 +253,11 @@
             <param name="allMatchedMethods"></param>
             <returns>True if a match was found, false otherwise</returns>
         </member>
+        <member name="P:BuildSoft.OscCore.OscClient.Socket">
+            <summary>
+            The socket for sending messages
+            </summary>
+        </member>
         <member name="P:BuildSoft.OscCore.OscClient.Writer">
             <summary>Serializes outgoing messages</summary>
         </member>
@@ -674,11 +679,6 @@
             WARNING - Changing this after strings have been encoded will probably lead to errors!
             </summary>
         </member>
-        <member name="T:BlobHandles.BlobHandleExtensionMethods">
-            <summary>
-            Extension methods for <see cref="T:BlobHandles.BlobHandle"/> or <see cref="T:BlobHandles.BlobString"/>.
-            </summary>
-        </member>
         <member name="T:Unity.IL2CPP.CompilerServices.BlobHandles.Option">
             <summary>
             The code generation options available for IL to C++ conversion.
@@ -767,6 +767,12 @@
             <param name="offset">The index in the bytes to start writing at</param>
         </member>
         <member name="M:MiniNtp.NtpTimestamp.ToBigEndianBytes(System.UInt32*)">
+            <summary>Convert to big-endian byte order</summary>
+            <param name="writePtr">The pointer to start writing at</param>
+        </member>
+    </members>
+</doc>
+name="M:MiniNtp.NtpTimestamp.ToBigEndianBytes(System.UInt32*)">
             <summary>Convert to big-endian byte order</summary>
             <param name="writePtr">The pointer to start writing at</param>
         </member>

@@ -9,6 +9,10 @@ namespace BuildSoft.OscCore;
 public class OscClient : IDisposable
 {
     readonly Socket _socket;
+    /// <summary>
+    /// The socket for sending messages
+    /// </summary>
+    public Socket Socket => _socket;
 
     /// <summary>Serializes outgoing messages</summary>
     public OscWriter Writer { get; }
