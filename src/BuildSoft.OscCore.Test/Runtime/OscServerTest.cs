@@ -14,11 +14,64 @@ namespace BuildSoft.OscCore.Test.Runtime;
 public class OscServerTest
 {
     private OscServer _server = null!;
+    private OscClient _client = null!;
 
-    [SetUp]
+    [StructLayout(LayoutKind.Explicit)]
+    struct FloatInt
+    {
+        [FieldOffset(0)]
+        public int Setter;
+        [FieldOffset(0)]
+        public float Value;
+
+        public FloatInt(float value)
+        {
+            Setter = 0;
+            Value = value;
+        }
+        public FloatInt(int setter)
+        {
+            Value = 0;
+            Setter = setter;
+        }
+    }
+
+    private static IEnumerable<float> AllFloatSource
+    {
+        get
+        {
+            var floatInt = new FloatInt();
+            for (long i = int.MinValue; i < int.MaxValue; i += int.MaxValue / 100)
+            {
+                floatInt.Setter = (int)i;
+                yield return floatInt.Value;
+            }
+            yield return new FloatInt(int.MaxValue).Value;
+        }
+    }
+    private static IEnumerable<int> AllIntSource
+    {
+        get
+        {
+            for (long i = int.MinValue; i < int.MaxValue; i += int.MaxValue / 100)
+            {
+                yield return (int)i;
+            }
+            yield return int.MaxValue;
+        }
+    }
+
+    [OneTimeSetUp]
     public void Setup()
     {
         _server = new OscServer(7000);
+        _client = new OscClient("127.0.0.1", 7000);
+    }
+    [OneTimeTearDown]
+    public void TearDown()
+    {
+        _server.Dispose();
+        _client.Dispose();
     }
 
     [Test]
@@ -34,5 +87,23 @@ public class OscServerTest
         Assert.IsFalse(_server.RemoveMonitorCallback(callback2));
         Assert.IsTrue(_server.RemoveMonitorCallback(callback1));
         Assert.IsFalse(_server.RemoveMonitorCallback(callback1));
+    }
+
+
+    [Test]
+    [TestCaseSource(nameof(AllFloatSource))]
+    public void CallbackTest2(float value)
+    {
+        OscMessageValues? values = null;
+        MonitorCallback callback1 = (_, v) => values = v;
+
+        _server.AddMonitorCallback(callback1);
+
+        _client.Send("/address/test", value);
+        TestUtil.LoopWhile(() => values == null, TimeSpan.FromMilliseconds(1000)).Wait();
+        Assert.AreEqual(value, values!.ReadFloatElement(0));
+        values = null;
+
+        Assert.IsTrue(_server.RemoveMonitorCallback(callback1));
     }
 }

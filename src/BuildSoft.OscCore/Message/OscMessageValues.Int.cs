@@ -24,12 +24,12 @@ public sealed unsafe partial class OscMessageValues
                        _sharedBuffer[offset + 2] << 8 |
                        _sharedBuffer[offset + 3];
             case TypeTag.Float32:
-                _swapBuffer32[0] = _sharedBuffer[offset + 3];
-                _swapBuffer32[1] = _sharedBuffer[offset + 2];
-                _swapBuffer32[2] = _sharedBuffer[offset + 1];
-                _swapBuffer32[3] = _sharedBuffer[offset];
-                float f = *_swapBuffer32Ptr;
-                return (int)f;
+                ConvertBuffer buffer = new();
+                buffer.Bits32[0] = _sharedBuffer[offset + 3];
+                buffer.Bits32[1] = _sharedBuffer[offset + 2];
+                buffer.Bits32[2] = _sharedBuffer[offset + 1];
+                buffer.Bits32[3] = _sharedBuffer[offset];
+                return (int)buffer.@float;
             default:
                 throw new InvalidOperationException();
         }
@@ -58,11 +58,12 @@ public sealed unsafe partial class OscMessageValues
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal uint ReadUIntIndex(int index)
     {
-        _swapBuffer32[0] = _sharedBuffer[index + 3];
-        _swapBuffer32[1] = _sharedBuffer[index + 2];
-        _swapBuffer32[2] = _sharedBuffer[index + 1];
-        _swapBuffer32[3] = _sharedBuffer[index];
-        return *_swapBuffer32UintPtr;
+        ConvertBuffer buffer = new();
+        buffer.Bits32[0] = _sharedBuffer[index + 3];
+        buffer.Bits32[1] = _sharedBuffer[index + 2];
+        buffer.Bits32[2] = _sharedBuffer[index + 1];
+        buffer.Bits32[3] = _sharedBuffer[index];
+        return buffer.@uint;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

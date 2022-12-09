@@ -19,11 +19,12 @@ public sealed unsafe partial class OscMessageValues
         switch (_tags[index])
         {
             case TypeTag.Float32:
-                _swapBuffer32[0] = _sharedBufferPtr[offset + 3];
-                _swapBuffer32[1] = _sharedBufferPtr[offset + 2];
-                _swapBuffer32[2] = _sharedBufferPtr[offset + 1];
-                _swapBuffer32[3] = _sharedBufferPtr[offset];
-                return *_swapBuffer32Ptr;
+                ConvertBuffer buffer = new();
+                buffer.Bits32[0] = _sharedBufferPtr[offset + 3];
+                buffer.Bits32[1] = _sharedBufferPtr[offset + 2];
+                buffer.Bits32[2] = _sharedBufferPtr[offset + 1];
+                buffer.Bits32[3] = _sharedBufferPtr[offset];
+                return buffer.@float;
             case TypeTag.Int32:
                 return _sharedBufferPtr[index] << 24 |
                        _sharedBufferPtr[index + 1] << 16 |
@@ -48,10 +49,11 @@ public sealed unsafe partial class OscMessageValues
         if (OutOfBounds(index)) return default;
 #endif
         var offset = _offsets[index];
-        _swapBuffer32[0] = _sharedBufferPtr[offset + 3];
-        _swapBuffer32[1] = _sharedBufferPtr[offset + 2];
-        _swapBuffer32[2] = _sharedBufferPtr[offset + 1];
-        _swapBuffer32[3] = _sharedBufferPtr[offset];
-        return *_swapBuffer32Ptr;
+        ConvertBuffer buffer = new();
+        buffer.Bits32[0] = _sharedBufferPtr[offset + 3];
+        buffer.Bits32[1] = _sharedBufferPtr[offset + 2];
+        buffer.Bits32[2] = _sharedBufferPtr[offset + 1];
+        buffer.Bits32[3] = _sharedBufferPtr[offset];
+        return buffer.@float;
     }
 }

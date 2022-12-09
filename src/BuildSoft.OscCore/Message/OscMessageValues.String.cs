@@ -18,6 +18,7 @@ public sealed unsafe partial class OscMessageValues
 #if OSCCORE_SAFETY_CHECKS
         if (OutOfBounds(index)) return string.Empty;
 #endif
+        ConvertBuffer buffer = new();
         var offset = _offsets[index];
         switch (_tags[index])
         {
@@ -26,48 +27,55 @@ public sealed unsafe partial class OscMessageValues
                 var length = 0;
                 while (_sharedBuffer[offset + length] != byte.MinValue) length++;
                 return Encoding.ASCII.GetString(_sharedBuffer, offset, length);
+
             case TypeTag.Float64:
-                _swapBuffer64[7] = _sharedBuffer[offset];
-                _swapBuffer64[6] = _sharedBuffer[offset + 1];
-                _swapBuffer64[5] = _sharedBuffer[offset + 2];
-                _swapBuffer64[4] = _sharedBuffer[offset + 3];
-                _swapBuffer64[3] = _sharedBuffer[offset + 4];
-                _swapBuffer64[2] = _sharedBuffer[offset + 5];
-                _swapBuffer64[1] = _sharedBuffer[offset + 6];
-                _swapBuffer64[0] = _sharedBuffer[offset + 7];
-                double f64 = *_swapBuffer64Ptr;
-                return f64.ToString(CultureInfo.CurrentCulture);
+                buffer.Bits64[7] = _sharedBuffer[offset];
+                buffer.Bits64[6] = _sharedBuffer[offset + 1];
+                buffer.Bits64[5] = _sharedBuffer[offset + 2];
+                buffer.Bits64[4] = _sharedBuffer[offset + 3];
+                buffer.Bits64[3] = _sharedBuffer[offset + 4];
+                buffer.Bits64[2] = _sharedBuffer[offset + 5];
+                buffer.Bits64[1] = _sharedBuffer[offset + 6];
+                buffer.Bits64[0] = _sharedBuffer[offset + 7];
+                return buffer.@double.ToString(CultureInfo.CurrentCulture);
+
             case TypeTag.Float32:
-                _swapBuffer32[0] = _sharedBuffer[offset + 3];
-                _swapBuffer32[1] = _sharedBuffer[offset + 2];
-                _swapBuffer32[2] = _sharedBuffer[offset + 1];
-                _swapBuffer32[3] = _sharedBuffer[offset];
-                float f32 = *_swapBuffer32Ptr;
-                return f32.ToString(CultureInfo.CurrentCulture);
+                buffer.Bits32[0] = _sharedBuffer[offset + 3];
+                buffer.Bits32[1] = _sharedBuffer[offset + 2];
+                buffer.Bits32[2] = _sharedBuffer[offset + 1];
+                buffer.Bits32[3] = _sharedBuffer[offset];
+                return buffer.@float.ToString(CultureInfo.CurrentCulture);
+
             case TypeTag.Int64:
                 var i64 = IPAddress.NetworkToHostOrder(_sharedBuffer[offset]);
                 return i64.ToString(CultureInfo.CurrentCulture);
+
             case TypeTag.Int32:
                 int i32 = _sharedBuffer[offset] << 24 |
                           _sharedBuffer[offset + 1] << 16 |
                           _sharedBuffer[offset + 2] << 8 |
                           _sharedBuffer[offset + 3];
                 return i32.ToString(CultureInfo.CurrentCulture);
+
             case TypeTag.False:
                 return "False";
+
             case TypeTag.True:
                 return "True";
+
             case TypeTag.Nil:
                 return "Nil";
+
             case TypeTag.Infinitum:
                 return "Infinitum";
+
             case TypeTag.Color32:
-                _swapBuffer32[0] = _sharedBuffer[offset + 3];
-                _swapBuffer32[1] = _sharedBuffer[offset + 2];
-                _swapBuffer32[2] = _sharedBuffer[offset + 1];
-                _swapBuffer32[3] = _sharedBuffer[offset];
-                var color32 = *_swapBufferColor32Ptr;
-                return color32.ToString();
+                buffer.Bits32[0] = _sharedBuffer[offset + 3];
+                buffer.Bits32[1] = _sharedBuffer[offset + 2];
+                buffer.Bits32[2] = _sharedBuffer[offset + 1];
+                buffer.Bits32[3] = _sharedBuffer[offset];
+                return buffer.Color32.ToString();
+
             case TypeTag.MIDI:
                 var midiPtr = _sharedBufferPtr + offset;
                 var midi = *(MidiMessage*)midiPtr;

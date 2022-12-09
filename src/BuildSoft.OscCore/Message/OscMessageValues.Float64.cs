@@ -16,25 +16,26 @@ public sealed unsafe partial class OscMessageValues
 #if OSCCORE_SAFETY_CHECKS
         if (OutOfBounds(index)) return default;
 #endif
+        ConvertBuffer buffer = new();
         var offset = _offsets[index];
         switch (_tags[index])
         {
             case TypeTag.Float64:
-                _swapBuffer64[7] = _sharedBuffer[offset];
-                _swapBuffer64[6] = _sharedBuffer[offset + 1];
-                _swapBuffer64[5] = _sharedBuffer[offset + 2];
-                _swapBuffer64[4] = _sharedBuffer[offset + 3];
-                _swapBuffer64[3] = _sharedBuffer[offset + 4];
-                _swapBuffer64[2] = _sharedBuffer[offset + 5];
-                _swapBuffer64[1] = _sharedBuffer[offset + 6];
-                _swapBuffer64[0] = _sharedBuffer[offset + 7];
-                return *_swapBuffer64Ptr;
+                buffer.Bits64[7] = _sharedBuffer[offset];
+                buffer.Bits64[6] = _sharedBuffer[offset + 1];
+                buffer.Bits64[5] = _sharedBuffer[offset + 2];
+                buffer.Bits64[4] = _sharedBuffer[offset + 3];
+                buffer.Bits64[3] = _sharedBuffer[offset + 4];
+                buffer.Bits64[2] = _sharedBuffer[offset + 5];
+                buffer.Bits64[1] = _sharedBuffer[offset + 6];
+                buffer.Bits64[0] = _sharedBuffer[offset + 7];
+                return buffer.@double;
             case TypeTag.Float32:
-                _swapBuffer32[0] = _sharedBuffer[offset + 3];
-                _swapBuffer32[1] = _sharedBuffer[offset + 2];
-                _swapBuffer32[2] = _sharedBuffer[offset + 1];
-                _swapBuffer32[3] = _sharedBuffer[offset];
-                return *_swapBuffer32Ptr;
+                buffer.Bits32[0] = _sharedBuffer[offset + 3];
+                buffer.Bits32[1] = _sharedBuffer[offset + 2];
+                buffer.Bits32[2] = _sharedBuffer[offset + 1];
+                buffer.Bits32[3] = _sharedBuffer[offset];
+                return buffer.@float;
             case TypeTag.Int64:
                 long bigEndian = *(_sharedBufferPtr + offset);
                 return IPAddress.NetworkToHostOrder(bigEndian);
@@ -62,14 +63,15 @@ public sealed unsafe partial class OscMessageValues
         if (OutOfBounds(index)) return default;
 #endif
         var offset = _offsets[index];
-        _swapBuffer64[7] = _sharedBuffer[offset];
-        _swapBuffer64[6] = _sharedBuffer[offset + 1];
-        _swapBuffer64[5] = _sharedBuffer[offset + 2];
-        _swapBuffer64[4] = _sharedBuffer[offset + 3];
-        _swapBuffer64[3] = _sharedBuffer[offset + 4];
-        _swapBuffer64[2] = _sharedBuffer[offset + 5];
-        _swapBuffer64[1] = _sharedBuffer[offset + 6];
-        _swapBuffer64[0] = _sharedBuffer[offset + 7];
-        return *_swapBuffer64Ptr;
+        ConvertBuffer buffer = new();
+        buffer.Bits64[7] = _sharedBuffer[offset];
+        buffer.Bits64[6] = _sharedBuffer[offset + 1];
+        buffer.Bits64[5] = _sharedBuffer[offset + 2];
+        buffer.Bits64[4] = _sharedBuffer[offset + 3];
+        buffer.Bits64[3] = _sharedBuffer[offset + 4];
+        buffer.Bits64[2] = _sharedBuffer[offset + 5];
+        buffer.Bits64[1] = _sharedBuffer[offset + 6];
+        buffer.Bits64[0] = _sharedBuffer[offset + 7];
+        return buffer.@double;
     }
 }

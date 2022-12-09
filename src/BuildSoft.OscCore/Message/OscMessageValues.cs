@@ -15,19 +15,31 @@ namespace BuildSoft.OscCore;
 /// </summary>
 public sealed unsafe partial class OscMessageValues
 {
+    [StructLayout(LayoutKind.Explicit)]
+    struct ConvertBuffer
+    {
+        [FieldOffset(0)]
+        public fixed byte Bits32[4];
+
+        [FieldOffset(0)]
+        public fixed byte Bits64[8];
+
+        [FieldOffset(0)]
+        public float @float;
+
+        [FieldOffset(0)]
+        public uint @uint;
+
+        [FieldOffset(0)]
+        public Color32 Color32;
+
+        [FieldOffset(0)]
+        public double @double;
+    }
+
     // the buffer where we read messages from - usually provided + filled by a socket reader
     readonly byte[] _sharedBuffer;
     readonly byte* _sharedBufferPtr;
-    // used to swap bytes for 32-bit numbers when reading
-    readonly byte[] _swapBuffer32 = new byte[4];
-    readonly float* _swapBuffer32Ptr;
-    readonly uint* _swapBuffer32UintPtr;
-    readonly Color32* _swapBufferColor32Ptr;
-    readonly GCHandle _swap32Handle;
-    // used to swap bytes for 64-bit numbers when reading
-    readonly byte[] _swapBuffer64 = new byte[8];
-    readonly double* _swapBuffer64Ptr;
-    readonly GCHandle _swap64Handle;
 
     /// <summary>
     /// All type tags in the message.
@@ -52,20 +64,6 @@ public sealed unsafe partial class OscMessageValues
         _sharedBuffer = buffer;
 
         fixed (byte* bufferPtr = buffer) { _sharedBufferPtr = bufferPtr; }
-
-        // pin byte swap buffers in place, so that we can count on the pointers never changing
-        var swap32Ptr = Utils.PinPtr(_swapBuffer32, out _swap32Handle);
-        _swapBuffer32Ptr = (float*)swap32Ptr;
-        _swapBuffer32UintPtr = (uint*)swap32Ptr;
-        _swapBufferColor32Ptr = (Color32*)(byte*)swap32Ptr;
-
-        _swapBuffer64Ptr = Utils.PinPtr<byte, double>(_swapBuffer64, out _swap64Handle);
-    }
-
-    ~OscMessageValues()
-    {
-        _swap32Handle.Free();
-        _swap64Handle.Free();
     }
 
     /// <summary>Execute a method for every element in the message</summary>

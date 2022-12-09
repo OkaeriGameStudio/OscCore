@@ -21,11 +21,12 @@ public sealed unsafe partial class OscMessageValues
         switch (_tags[index])
         {
             case TypeTag.Color32:
-                _swapBuffer32[0] = _sharedBuffer[offset + 3];
-                _swapBuffer32[1] = _sharedBuffer[offset + 2];
-                _swapBuffer32[2] = _sharedBuffer[offset + 1];
-                _swapBuffer32[3] = _sharedBuffer[offset];
-                return *_swapBufferColor32Ptr;
+                ConvertBuffer buffer = new();
+                buffer.Bits32[0] = _sharedBuffer[offset + 3];
+                buffer.Bits32[1] = _sharedBuffer[offset + 2];
+                buffer.Bits32[2] = _sharedBuffer[offset + 1];
+                buffer.Bits32[3] = _sharedBuffer[offset];
+                return buffer.Color32;
             default:
                 throw new InvalidOperationException();
         }
@@ -45,10 +46,11 @@ public sealed unsafe partial class OscMessageValues
         if (OutOfBounds(index)) return default;
 #endif
         var offset = _offsets[index];
-        _swapBuffer32[0] = _sharedBuffer[offset + 3];
-        _swapBuffer32[1] = _sharedBuffer[offset + 2];
-        _swapBuffer32[2] = _sharedBuffer[offset + 1];
-        _swapBuffer32[3] = _sharedBuffer[offset];
-        return *_swapBufferColor32Ptr;
+        ConvertBuffer buffer = new();
+        buffer.Bits32[0] = _sharedBuffer[offset + 3];
+        buffer.Bits32[1] = _sharedBuffer[offset + 2];
+        buffer.Bits32[2] = _sharedBuffer[offset + 1];
+        buffer.Bits32[3] = _sharedBuffer[offset];
+        return buffer.Color32;
     }
 }
