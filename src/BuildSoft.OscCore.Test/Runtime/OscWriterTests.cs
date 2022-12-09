@@ -11,7 +11,7 @@ namespace BuildSoft.OscCore.Tests;
 
 public class OscWriterTests
 {
-    readonly OscWriter m_Writer = new OscWriter();
+    readonly OscWriter m_Writer = new();
 
     int m_WriterLengthBefore;
 

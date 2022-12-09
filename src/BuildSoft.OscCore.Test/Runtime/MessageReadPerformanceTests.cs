@@ -12,7 +12,7 @@ public class MessageReadPerformanceTests
 {
     const int k_Count = 4096;
 
-    static readonly Stopwatch Stopwatch = new Stopwatch();
+    static readonly Stopwatch Stopwatch = new();
 
     int[] m_IntSourceData = new int[k_Count];
     float[] m_FloatSourceData = new float[k_Count];
@@ -22,7 +22,7 @@ public class MessageReadPerformanceTests
     byte[] m_MidiSourceBytes = null!;
     byte[] m_TimeSourceBytes = null!;
 
-    List<GCHandle> m_Handles = new List<GCHandle>();
+    List<GCHandle> m_Handles = new();
 
     [OneTimeSetUp]
     public void BeforeAll()

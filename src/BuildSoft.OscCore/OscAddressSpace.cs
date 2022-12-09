@@ -16,8 +16,8 @@ public sealed class OscAddressSpace
     internal Regex[] _patterns = new Regex[DefaultPatternCapacity];
     internal OscActionPair[] _patternMethods = new OscActionPair[DefaultPatternCapacity];
 
-    readonly Queue<int> _freedPatternIndices = new Queue<int>();
-    readonly Dictionary<string, int> _patternStringToIndex = new Dictionary<string, int>();
+    readonly Queue<int> _freedPatternIndices = new();
+    readonly Dictionary<string, int> _patternStringToIndex = new();
 
     public int HandlerCount => _addressToMethod.HandleToValue.Count;
 

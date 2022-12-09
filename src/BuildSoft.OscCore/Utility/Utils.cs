@@ -11,8 +11,8 @@ namespace BuildSoft.OscCore;
 
 static class Utils
 {
-    static readonly List<char> _tempChars = new List<char>();
-    static readonly StringBuilder _builder = new StringBuilder();
+    static readonly List<char> _tempChars = new();
+    static readonly StringBuilder _builder = new();
 
     public static bool ValidateAddress(ref string address)
     {

@@ -10,8 +10,7 @@ namespace BuildSoft.OscCore;
 public sealed unsafe class OscServer : IDisposable
 {
     // used to allow easy removal of single callbacks
-    static readonly Dictionary<Action<OscMessageValues>, OscActionPair> _singleCallbackToPair =
-        new Dictionary<Action<OscMessageValues>, OscActionPair>();
+    static readonly Dictionary<Action<OscMessageValues>, OscActionPair> _singleCallbackToPair = new();
 
     readonly OscSocket _socket;
     bool _disposed;
@@ -24,18 +23,18 @@ public sealed unsafe class OscServer : IDisposable
     Action?[] _mainThreadQueue = new Action[16];
     int _mainThreadCount;
 
-    readonly Dictionary<int, string> _byteLengthToStringBuffer = new Dictionary<int, string>();
+    readonly Dictionary<int, string> _byteLengthToStringBuffer = new();
 
-    readonly List<MonitorCallback> _monitorCallbacks = new List<MonitorCallback>();
+    readonly List<MonitorCallback> _monitorCallbacks = new();
 
-    readonly List<OscActionPair> _patternMatchedMethods = new List<OscActionPair>();
+    readonly List<OscActionPair> _patternMatchedMethods = new();
 
     internal bool Running { get; set; }
 
     /// <summary>
     /// Map from port number to the server that handles incoming messages for it
     /// </summary>
-    public static readonly Dictionary<int, OscServer> PortToServer = new Dictionary<int, OscServer>();
+    public static readonly Dictionary<int, OscServer> PortToServer = new();
 
     public int Port { get; }
     public OscAddressSpace AddressSpace { get; private set; }
