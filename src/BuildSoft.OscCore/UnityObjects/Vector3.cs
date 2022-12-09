@@ -1,4 +1,6 @@
-﻿namespace BuildSoft.OscCore.UnityObjects;
+﻿using System.Globalization;
+
+namespace BuildSoft.OscCore.UnityObjects;
 
 public struct Vector3
 {
@@ -25,6 +27,23 @@ public struct Vector3
     public bool Equals(Vector3 other) => x == other.x && y == other.y && z == other.z;
 
     public override int GetHashCode() => x.GetHashCode() ^ (y.GetHashCode() << 2) ^ (z.GetHashCode() >> 2);
+
+    public override string ToString()
+    {
+        return ToString(null, CultureInfo.InvariantCulture.NumberFormat);
+    }
+
+    public string ToString(string? format)
+    {
+        return ToString(format, CultureInfo.InvariantCulture.NumberFormat);
+    }
+
+    public string ToString(string? format, IFormatProvider formatProvider)
+    {
+        if (string.IsNullOrEmpty(format))
+            format = "F1";
+        return string.Format(CultureInfo.InvariantCulture.NumberFormat, "({0}, {1}, {2})", x.ToString(format, formatProvider), y.ToString(format, formatProvider), z.ToString(format, formatProvider));
+    }
 
     public static bool operator ==(Vector3 lhs, Vector3 rhs)
     {
