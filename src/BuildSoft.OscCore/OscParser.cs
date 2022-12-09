@@ -1,8 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("OscCore.Tests.Editor")]
-[assembly: InternalsVisibleTo("OscCore.Tests.Runtime")]
-
 namespace BuildSoft.OscCore;
 
 public unsafe class OscParser

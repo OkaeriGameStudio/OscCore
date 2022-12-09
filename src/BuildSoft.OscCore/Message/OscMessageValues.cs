@@ -4,10 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using BuildSoft.OscCore.UnityObjects;
 
-
-// allow tests to modify things as if in the same assembly
-[assembly: InternalsVisibleTo("OscCore.Tests.Editor")]
-
 namespace BuildSoft.OscCore;
 
 /// <summary>

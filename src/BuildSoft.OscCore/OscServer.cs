@@ -5,8 +5,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using BlobHandles;
 
-[assembly: InternalsVisibleTo("OscCore.Editor")]
-
 namespace BuildSoft.OscCore;
 
 public sealed unsafe class OscServer : IDisposable
