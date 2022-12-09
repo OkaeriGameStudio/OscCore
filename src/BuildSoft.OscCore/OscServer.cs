@@ -83,8 +83,7 @@ public sealed unsafe class OscServer : IDisposable
     /// <returns></returns>
     public static OscServer GetOrCreate(int port)
     {
-        OscServer server;
-        if (!PortToServer.TryGetValue(port, out server))
+        if (!PortToServer.TryGetValue(port, out var server))
         {
             server = new OscServer(port);
             PortToServer[port] = server;
@@ -97,8 +96,7 @@ public sealed unsafe class OscServer : IDisposable
     /// <returns>True if the server was found and disposed of, false otherwise</returns>
     public static bool Remove(int port)
     {
-        OscServer server;
-        if (PortToServer.TryGetValue(port, out server))
+        if (PortToServer.TryGetValue(port, out var server))
         {
             server.Dispose();
             return PortToServer.Remove(port);
