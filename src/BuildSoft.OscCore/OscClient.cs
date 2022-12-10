@@ -8,7 +8,7 @@ namespace BuildSoft.OscCore;
 
 public class OscClient : IDisposable
 {
-    readonly Socket _socket;
+    private readonly Socket _socket;
     /// <summary>
     /// The socket for sending messages
     /// </summary>
@@ -46,7 +46,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint Int32TypeTagBytes = 26924;    // ",i  " 
+    private const uint Int32TypeTagBytes = 26924;    // ",i  " 
 
     /// <summary>Send a message with a single 32-bit integer element</summary>
     public void Send(string address, int element)
@@ -56,7 +56,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint Float32TypeTagBytes = 26156;    // ",f  " 
+    private const uint Float32TypeTagBytes = 26156;    // ",f  " 
 
     /// <summary>Send a message with a single 32-bit float element</summary>
     public void Send(string address, float element)
@@ -66,7 +66,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint StringTypeTagBytes = 29484;    // ",s  " 
+    private const uint StringTypeTagBytes = 29484;    // ",s  " 
 
     /// <summary>Send a message with a single string element</summary>
     public void Send(string address, string element)
@@ -76,7 +76,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint BlobTypeTagBytes = 25132;    // ",b  " 
+    private const uint BlobTypeTagBytes = 25132;    // ",b  " 
 
     /// <summary>Send a message with a single blob element</summary>
     /// <param name="address">The OSC address</param>
@@ -112,7 +112,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint Int64TypeTagBytes = 25644;    // ",d  " 
+    private const uint Int64TypeTagBytes = 25644;    // ",d  " 
 
     /// <summary>Send a message with a single 64-bit float element</summary>
     public void Send(string address, double element)
@@ -122,7 +122,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint Float64TypeTagBytes = 26668;    // ",h  " 
+    private const uint Float64TypeTagBytes = 26668;    // ",h  " 
 
     /// <summary>Send a message with a single 64-bit integer element</summary>
     public void Send(string address, long element)
@@ -132,7 +132,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint Color32TypeTagBytes = 29228;    // ",r  " 
+    private const uint Color32TypeTagBytes = 29228;    // ",r  " 
 
     /// <summary>Send a message with a single 32-bit color element</summary>
     public void Send(string address, Color32 element)
@@ -142,7 +142,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint MidiTypeTagBytes = 27948;    // ",m  " 
+    private const uint MidiTypeTagBytes = 27948;    // ",m  " 
 
     /// <summary>Send a message with a single MIDI message element</summary>
     public void Send(string address, MidiMessage element)
@@ -152,7 +152,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint CharTypeTagBytes = 25388;    // ",c  " 
+    private const uint CharTypeTagBytes = 25388;    // ",c  " 
 
     /// <summary>Send a message with a single ascii character element</summary>
     public void Send(string address, char element)
@@ -162,8 +162,8 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint TrueTypeTagBytes = 21548;    // ",T  " 
-    const uint FalseTypeTagBytes = 17964;    // ",F  " 
+    private const uint TrueTypeTagBytes = 21548;    // ",T  " 
+    private const uint FalseTypeTagBytes = 17964;    // ",F  " 
 
     /// <summary>Send a message with a single True or False tag element</summary>
     public void Send(string address, bool element)
@@ -172,7 +172,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint NilTypeTagBytes = 20012;    // ",N  " 
+    private const uint NilTypeTagBytes = 20012;    // ",N  " 
 
     /// <summary>Send a message with a single Nil ('N') tag element</summary>
     public void SendNil(string address)
@@ -181,7 +181,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    const uint InfinitumTypeTagBytes = 18732;    // ",I  " 
+    private const uint InfinitumTypeTagBytes = 18732;    // ",I  " 
 
     /// <summary>Send a message with a single Infinitum ('I') tag element</summary>
     public void SendInfinitum(string address)
@@ -190,7 +190,7 @@ public class OscClient : IDisposable
         _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
-    static unsafe uint[] GetAlignedAsciiBytes(string input)
+    private static unsafe uint[] GetAlignedAsciiBytes(string input)
     {
         var count = Encoding.ASCII.GetByteCount(input);
         var alignedCount = (count + 3) & ~3;
@@ -205,7 +205,7 @@ public class OscClient : IDisposable
         return bytes;
     }
 
-    bool _isDisporsed = false;
+    private bool _isDisporsed = false;
     public void Dispose()
     {
         if (!_isDisporsed)

@@ -10,19 +10,15 @@ namespace BuildSoft.OscCore.Tests;
 
 public class MessageReadPerformanceTests
 {
-    const int k_Count = 4096;
-
-    static readonly Stopwatch Stopwatch = new();
-
-    int[] m_IntSourceData = new int[k_Count];
-    float[] m_FloatSourceData = new float[k_Count];
-
-    byte[] m_BigEndianIntSourceBytes = new byte[k_Count * 4];
-    byte[] m_BigEndianFloatSourceBytes = new byte[k_Count * 4];
-    byte[] m_MidiSourceBytes = null!;
-    byte[] m_TimeSourceBytes = null!;
-
-    List<GCHandle> m_Handles = new();
+    private const int k_Count = 4096;
+    private static readonly Stopwatch Stopwatch = new();
+    private int[] m_IntSourceData = new int[k_Count];
+    private float[] m_FloatSourceData = new float[k_Count];
+    private byte[] m_BigEndianIntSourceBytes = new byte[k_Count * 4];
+    private byte[] m_BigEndianFloatSourceBytes = new byte[k_Count * 4];
+    private byte[] m_MidiSourceBytes = null!;
+    private byte[] m_TimeSourceBytes = null!;
+    private List<GCHandle> m_Handles = new();
 
     [OneTimeSetUp]
     public void BeforeAll()
@@ -66,7 +62,7 @@ public class MessageReadPerformanceTests
         }
     }
 
-    static OscMessageValues FromBytes(byte[] bytes, int count, TypeTag tag, int byteSize = 4)
+    private static OscMessageValues FromBytes(byte[] bytes, int count, TypeTag tag, int byteSize = 4)
     {
         var values = new OscMessageValues(bytes, count);
         for (int i = 0; i < count; i++)

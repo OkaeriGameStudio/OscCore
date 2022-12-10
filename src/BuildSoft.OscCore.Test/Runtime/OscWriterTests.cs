@@ -11,9 +11,8 @@ namespace BuildSoft.OscCore.Tests;
 
 public class OscWriterTests
 {
-    readonly OscWriter m_Writer = new();
-
-    int m_WriterLengthBefore;
+    private readonly OscWriter m_Writer = new();
+    private int m_WriterLengthBefore;
 
     [SetUp]
     public void BeforeEach()
@@ -213,7 +212,7 @@ public class OscWriterTests
         Assert.True(data == new Vector3(readX, readY, readZ));
     }
 
-    static byte[] RandomBytes(int count)
+    private static byte[] RandomBytes(int count)
     {
         var bytes = new byte[count];
         for (int i = 0; i < bytes.Length; i++)

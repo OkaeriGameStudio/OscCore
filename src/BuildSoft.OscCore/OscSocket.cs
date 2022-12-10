@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace BuildSoft.OscCore;
 
-sealed class OscSocket : IDisposable
+internal sealed class OscSocket : IDisposable
 {
-    readonly Socket _socket;
-    readonly Task _task;
-    bool _disposed;
-    bool _started;
+    private readonly Socket _socket;
+    private readonly Task _task;
+    private bool _disposed;
+    private bool _started;
 
     public int Port { get; }
     public OscServer Server { get; }
@@ -36,7 +36,7 @@ sealed class OscSocket : IDisposable
         _started = true;
     }
 
-    void Serve()
+    private void Serve()
     {
 #if UNITY_EDITOR
             Profiler.BeginThreadProfiling("OscCore", "Server");

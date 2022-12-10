@@ -17,8 +17,8 @@ public struct BlobString : IDisposable, IEquatable<BlobString>
     public static Encoding Encoding { get; set; } = Encoding.ASCII;
 
     // Stores all of the bytes that represent this string
-    readonly byte[] Bytes;
-    readonly GCHandle byteHandle;
+    private readonly byte[] Bytes;
+    private readonly GCHandle byteHandle;
 
     public readonly BlobHandle Handle;
 

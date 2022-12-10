@@ -10,24 +10,18 @@ namespace BuildSoft.OscCore;
 public sealed unsafe class OscServer : IDisposable
 {
     // used to allow easy removal of single callbacks
-    static readonly Dictionary<Action<OscMessageValues>, OscActionPair> _singleCallbackToPair = new();
-
-    readonly OscSocket _socket;
-    bool _disposed;
-    bool _started;
-
-    readonly byte[] _readBuffer;
-    GCHandle _bufferHandle;
-    readonly byte* _bufferPtr;
-
-    Action?[] _mainThreadQueue = new Action[16];
-    int _mainThreadCount;
-
-    readonly Dictionary<int, string> _byteLengthToStringBuffer = new();
-
-    readonly List<MonitorCallback> _monitorCallbacks = new();
-
-    readonly List<OscActionPair> _patternMatchedMethods = new();
+    private static readonly Dictionary<Action<OscMessageValues>, OscActionPair> _singleCallbackToPair = new();
+    private readonly OscSocket _socket;
+    private bool _disposed;
+    private bool _started;
+    private readonly byte[] _readBuffer;
+    private GCHandle _bufferHandle;
+    private readonly byte* _bufferPtr;
+    private Action?[] _mainThreadQueue = new Action[16];
+    private int _mainThreadCount;
+    private readonly Dictionary<int, string> _byteLengthToStringBuffer = new();
+    private readonly List<MonitorCallback> _monitorCallbacks = new();
+    private readonly List<OscActionPair> _patternMatchedMethods = new();
 
     internal bool Running { get; set; }
 
@@ -300,7 +294,7 @@ public sealed unsafe class OscServer : IDisposable
         while (recurse);
     }
 
-    void HandleCallbacks(OscActionPair pair, OscMessageValues messageValues)
+    private void HandleCallbacks(OscActionPair pair, OscMessageValues messageValues)
     {
         // call the value read method associated with this OSC address    
         pair.ValueRead(messageValues);
@@ -315,7 +309,7 @@ public sealed unsafe class OscServer : IDisposable
         }
     }
 
-    void HandleMonitorCallbacks(byte* bufferPtr, int addressLength, OscParser parser)
+    private void HandleMonitorCallbacks(byte* bufferPtr, int addressLength, OscParser parser)
     {
         // handle monitor callbacks
         var monitorAddressStr = new BlobString(bufferPtr, addressLength);
@@ -323,7 +317,7 @@ public sealed unsafe class OscServer : IDisposable
             callback(monitorAddressStr, parser.MessageValues);
     }
 
-    void TryMatchPatterns(OscParser parser, byte* bufferPtr, int addressLength)
+    private void TryMatchPatterns(OscParser parser, byte* bufferPtr, int addressLength)
     {
         // to support OSC address patterns, we test unmatched addresses against regular expressions
         // To do that, we need it as a regular string.  We may be able to mutate a previous string, 
@@ -352,7 +346,7 @@ public sealed unsafe class OscServer : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static void OverwriteAsciiString(string str, byte* bufferPtr)
+    private static void OverwriteAsciiString(string str, byte* bufferPtr)
     {
         fixed (char* addressPtr = str)
         {

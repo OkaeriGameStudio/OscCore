@@ -7,9 +7,8 @@ namespace BuildSoft.OscCore.Tests;
 public static class TestUtil
 {
     public static readonly Random SharedRandom = new();
-
-    static readonly byte[] k_Swap32 = new byte[4];
-    static readonly byte[] k_Swap64 = new byte[8];
+    private static readonly byte[] k_Swap32 = new byte[4];
+    private static readonly byte[] k_Swap64 = new byte[8];
 
     public static int ReverseBytes(this int self)
     {

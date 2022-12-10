@@ -9,7 +9,7 @@ namespace BuildSoft.OscCore;
 /// <summary>Maps from OSC address to the delegates associated with it</summary>
 internal sealed unsafe class OscAddressMethods : IDisposable
 {
-    const int DefaultSize = 16;
+    private const int DefaultSize = 16;
 
     /// <summary>
     /// Map from the unmanaged representation of an OSC address to the delegates associated with it

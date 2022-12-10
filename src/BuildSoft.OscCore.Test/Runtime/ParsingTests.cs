@@ -9,10 +9,10 @@ namespace BuildSoft.OscCore.Tests;
 
 public class ParsingTests
 {
-    const int k_BufferSize = 4096;
-    readonly byte[] m_Buffer = new byte[k_BufferSize];
-    GCHandle m_BufferHandle;
-    OscParser m_Parser = null!;
+    private const int k_BufferSize = 4096;
+    private readonly byte[] m_Buffer = new byte[k_BufferSize];
+    private GCHandle m_BufferHandle;
+    private OscParser m_Parser = null!;
 
     [OneTimeSetUp]
     public void BeforeAll()

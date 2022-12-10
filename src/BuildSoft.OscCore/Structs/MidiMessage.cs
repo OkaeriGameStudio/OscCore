@@ -6,7 +6,7 @@ namespace BuildSoft.OscCore;
 [StructLayout(LayoutKind.Explicit)]
 public struct MidiMessage : IEquatable<MidiMessage>
 {
-    [FieldOffset(0)] readonly int data;
+    [FieldOffset(0)] private readonly int data;
 
     [FieldOffset(0)] public readonly byte PortId;
     [FieldOffset(1)] public readonly byte Status;

@@ -1,6 +1,6 @@
 ﻿namespace BuildSoft.OscCore;
 
-enum AddressType
+internal enum AddressType
 {
     Invalid,
     Pattern,

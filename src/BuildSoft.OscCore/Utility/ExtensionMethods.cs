@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace BuildSoft.OscCore;
 
-static class ExtensionMethods
+internal static class ExtensionMethods
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Align4(this int self)

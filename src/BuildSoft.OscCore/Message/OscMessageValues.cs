@@ -12,7 +12,7 @@ namespace BuildSoft.OscCore;
 public sealed unsafe partial class OscMessageValues
 {
     [StructLayout(LayoutKind.Explicit)]
-    struct ConvertBuffer
+    private struct ConvertBuffer
     {
         [FieldOffset(0)]
         public fixed byte Bits32[4];
@@ -34,8 +34,8 @@ public sealed unsafe partial class OscMessageValues
     }
 
     // the buffer where we read messages from - usually provided + filled by a socket reader
-    readonly byte[] _sharedBuffer;
-    readonly byte* _sharedBufferPtr;
+    private readonly byte[] _sharedBuffer;
+    private readonly byte* _sharedBufferPtr;
 
     /// <summary>
     /// All type tags in the message.
@@ -84,7 +84,7 @@ public sealed unsafe partial class OscMessageValues
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool OutOfBounds(int index)
+    private bool OutOfBounds(int index)
     {
         if (index >= ElementCount)
         {

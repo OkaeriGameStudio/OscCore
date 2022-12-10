@@ -1,6 +1,6 @@
 ﻿namespace BuildSoft.OscCore;
 
-enum Vector3ElementFilter : byte
+internal enum Vector3ElementFilter : byte
 {
     XYZ = 0,
     X = 1,
@@ -11,7 +11,7 @@ enum Vector3ElementFilter : byte
     YZ = 6
 }
 
-enum Vector2ElementFilter : byte
+internal enum Vector2ElementFilter : byte
 {
     XY = 0,
     X = 1,

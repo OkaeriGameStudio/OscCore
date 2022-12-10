@@ -11,10 +11,10 @@ namespace BlobHandles;
 /// <typeparam name="T">The type to associate a string key with</typeparam>
 public sealed unsafe class BlobStringDictionary<T> : IDisposable
 {
-    const int defaultSize = 16;
+    private const int defaultSize = 16;
 
     public readonly Dictionary<BlobHandle, T> HandleToValue;
-    readonly Dictionary<string, BlobString> SourceToBlob;
+    private readonly Dictionary<string, BlobString> SourceToBlob;
 
     public BlobStringDictionary(int initialCapacity = defaultSize)
     {

@@ -6,8 +6,8 @@ namespace BuildSoft.OscCore;
 
 public sealed class OscAddressSpace
 {
-    const int DefaultPatternCapacity = 8;
-    const int DefaultCapacity = 16;
+    private const int DefaultPatternCapacity = 8;
+    private const int DefaultCapacity = 16;
 
     internal readonly OscAddressMethods _addressToMethod;
 
@@ -15,9 +15,8 @@ public sealed class OscAddressSpace
     internal int _patternCount;
     internal Regex[] _patterns = new Regex[DefaultPatternCapacity];
     internal OscActionPair[] _patternMethods = new OscActionPair[DefaultPatternCapacity];
-
-    readonly Queue<int> _freedPatternIndices = new();
-    readonly Dictionary<string, int> _patternStringToIndex = new();
+    private readonly Queue<int> _freedPatternIndices = new();
+    private readonly Dictionary<string, int> _patternStringToIndex = new();
 
     public int HandlerCount => _addressToMethod.HandleToValue.Count;
 

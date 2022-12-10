@@ -5,7 +5,7 @@ namespace BuildSoft.OscCore;
 
 public sealed unsafe partial class OscMessageValues
 {
-    const int ResizeByteHeadroom = 1024;
+    private const int ResizeByteHeadroom = 1024;
 
     /// <summary>
     /// Read a blob element.

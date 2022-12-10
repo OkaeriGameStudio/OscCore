@@ -11,7 +11,7 @@ public sealed unsafe class OscWriter : IDisposable
 {
     public byte[] Buffer { get; }
 
-    int _length;
+    private int _length;
 
     /// <summary>The number of bytes currently written to the buffer</summary>
     public int Length => _length;

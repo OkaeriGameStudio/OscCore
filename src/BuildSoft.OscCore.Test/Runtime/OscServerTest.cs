@@ -17,7 +17,7 @@ public class OscServerTest
     private OscClient _client = null!;
 
     [StructLayout(LayoutKind.Explicit)]
-    struct FloatInt
+    private struct FloatInt
     {
         [FieldOffset(0)]
         public int Setter;

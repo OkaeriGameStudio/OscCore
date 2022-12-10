@@ -3,7 +3,7 @@ using System.Text;
 
 namespace BuildSoft.OscCore;
 
-static class Constant
+internal static class Constant
 {
     public const byte Comma = (byte)',';
     public const byte ForwardSlash = (byte)'/';

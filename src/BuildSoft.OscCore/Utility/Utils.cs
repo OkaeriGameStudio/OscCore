@@ -9,10 +9,10 @@ using BlobHandles;
 
 namespace BuildSoft.OscCore;
 
-static class Utils
+internal static class Utils
 {
-    static readonly List<char> _tempChars = new();
-    static readonly StringBuilder _builder = new();
+    private static readonly List<char> _tempChars = new();
+    private static readonly StringBuilder _builder = new();
 
     public static bool ValidateAddress(ref string address)
     {

@@ -21,7 +21,7 @@ internal static class MessageTestData
         }
     }
 
-    static byte[] SingleFloatMessage(string address, float value)
+    private static byte[] SingleFloatMessage(string address, float value)
     {
         var addressBytes = Encoding.ASCII.GetBytes(address);
         var alignedByteCount = (addressBytes.Length + 3) & ~3;
@@ -87,7 +87,7 @@ internal static class TagsTestData
     }
 }
 
-static class MidiTestData
+internal static class MidiTestData
 {
     public static IEnumerable Basic
     {
@@ -125,8 +125,7 @@ static class MidiTestData
     }
 }
 
-
-static class BundleData
+internal static class BundleData
 {
     public static byte[] GetRecursiveBundlesExample()
     {
@@ -150,7 +149,7 @@ static class BundleData
         return bytes;
     }
 
-    static void WriteIntBundleElement(OscWriter writer, string address, int value)
+    private static void WriteIntBundleElement(OscWriter writer, string address, int value)
     {
         var typeTags = ",i";
         var firstAddressByteCount = Encoding.ASCII.GetByteCount(address).Align4();
@@ -163,7 +162,7 @@ static class BundleData
         writer.Write(value);
     }
 
-    static void WriteFloatBundleElement(OscWriter writer, string address, float value)
+    private static void WriteFloatBundleElement(OscWriter writer, string address, float value)
     {
         var typeTags = ",f";
         var firstAddressByteCount = Encoding.ASCII.GetByteCount(address).Align4();
