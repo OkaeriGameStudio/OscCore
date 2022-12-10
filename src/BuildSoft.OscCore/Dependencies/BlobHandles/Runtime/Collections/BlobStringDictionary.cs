@@ -11,15 +11,15 @@ namespace BlobHandles;
 /// <typeparam name="T">The type to associate a string key with</typeparam>
 public sealed unsafe class BlobStringDictionary<T> : IDisposable
 {
-    private const int defaultSize = 16;
+    private const int DefaultSize = 16;
 
     public readonly Dictionary<BlobHandle, T> HandleToValue;
-    private readonly Dictionary<string, BlobString> SourceToBlob;
+    private readonly Dictionary<string, BlobString> _sourceToBlob;
 
-    public BlobStringDictionary(int initialCapacity = defaultSize)
+    public BlobStringDictionary(int initialCapacity = DefaultSize)
     {
         HandleToValue = new Dictionary<BlobHandle, T>(initialCapacity);
-        SourceToBlob = new Dictionary<string, BlobString>(initialCapacity);
+        _sourceToBlob = new Dictionary<string, BlobString>(initialCapacity);
     }
 
     /// <summary>Converts a string into a BlobString and adds it and the value to the dictionary</summary>
@@ -28,12 +28,12 @@ public sealed unsafe class BlobStringDictionary<T> : IDisposable
     [Il2CppSetOption(Option.NullChecks, false)]
     public void Add(string str, T value)
     {
-        if (str == null || SourceToBlob.ContainsKey(str))
+        if (str == null || _sourceToBlob.ContainsKey(str))
             return;
 
         var blobStr = new BlobString(str);
         HandleToValue.Add(blobStr.Handle, value);
-        SourceToBlob.Add(str, blobStr);
+        _sourceToBlob.Add(str, blobStr);
     }
 
     /// <summary>Adds a BlobString and its associated value to the dictionary</summary>
@@ -51,10 +51,10 @@ public sealed unsafe class BlobStringDictionary<T> : IDisposable
     [Il2CppSetOption(Option.NullChecks, false)]
     public bool Remove(string str)
     {
-        if (!SourceToBlob.TryGetValue(str, out var blobStr))
+        if (!_sourceToBlob.TryGetValue(str, out var blobStr))
             return false;
 
-        SourceToBlob.Remove(str);
+        _sourceToBlob.Remove(str);
         var removed = HandleToValue.Remove(blobStr.Handle);
         blobStr.Dispose();
         return removed;
@@ -79,12 +79,12 @@ public sealed unsafe class BlobStringDictionary<T> : IDisposable
     public void Clear()
     {
         HandleToValue.Clear();
-        SourceToBlob.Clear();
+        _sourceToBlob.Clear();
     }
 
     public void Dispose()
     {
-        foreach (var kvp in SourceToBlob)
+        foreach (var kvp in _sourceToBlob)
             kvp.Value.Dispose();
     }
 }

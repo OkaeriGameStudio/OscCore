@@ -9,38 +9,38 @@ namespace BuildSoft.OscCore.Tests;
 
 public class ParsingTests
 {
-    private const int k_BufferSize = 4096;
-    private readonly byte[] m_Buffer = new byte[k_BufferSize];
-    private GCHandle m_BufferHandle;
-    private OscParser m_Parser = null!;
+    private const int BufferSize = 4096;
+    private readonly byte[] _buffer = new byte[BufferSize];
+    private GCHandle _bufferHandle;
+    private OscParser _parser = null!;
 
     [OneTimeSetUp]
     public void BeforeAll()
     {
-        m_BufferHandle = GCHandle.Alloc(m_Buffer, GCHandleType.Pinned);
-        m_Parser = new OscParser(m_Buffer);
+        _bufferHandle = GCHandle.Alloc(_buffer, GCHandleType.Pinned);
+        _parser = new OscParser(_buffer);
     }
 
     [SetUp]
     public void BeforeEach()
     {
-        m_Parser.MessageValues.ElementCount = 0;
+        _parser.MessageValues.ElementCount = 0;
     }
 
     [OneTimeTearDown]
     public void AfterAll()
     {
-        if (m_BufferHandle.IsAllocated) m_BufferHandle.Free();
+        if (_bufferHandle.IsAllocated) _bufferHandle.Free();
     }
 
     [TestCaseSource(typeof(TagsTestData), nameof(TagsTestData.StandardTagParseCases))]
     public void SimpleTagParsing(TypeTagParseTestCase test)
     {
-        var tagSize = m_Parser.ParseTags(test.Bytes, test.Start);
+        var tagSize = _parser.ParseTags(test.Bytes, test.Start);
         var tagCount = tagSize - 1; // remove ','
 
         Assert.AreEqual(test.Expected.Length, tagCount);
-        var tags = m_Parser.MessageValues._tags;
+        var tags = _parser.MessageValues._tags;
         for (var i = 0; i < tagCount; i++)
         {
             var tag = tags[i];
@@ -52,12 +52,12 @@ public class ParsingTests
     public void TagParsing_MustStartWithComma()
     {
         var commaAfterStart = new byte[] { 0, (byte)',', 1, 2 };
-        Assert.Zero(m_Parser.ParseTags(commaAfterStart));
-        Assert.Zero(m_Parser.MessageValues.ElementCount);
+        Assert.Zero(_parser.ParseTags(commaAfterStart));
+        Assert.Zero(_parser.MessageValues.ElementCount);
 
         var noCommaBeforeTags = new byte[] { (byte)'f', (byte)'i', 1, 2 };
-        Assert.Zero(m_Parser.ParseTags(noCommaBeforeTags));
-        Assert.Zero(m_Parser.MessageValues.ElementCount);
+        Assert.Zero(_parser.ParseTags(noCommaBeforeTags));
+        Assert.Zero(_parser.MessageValues.ElementCount);
     }
 
     [TestCaseSource(typeof(MidiTestData), nameof(MidiTestData.Basic))]

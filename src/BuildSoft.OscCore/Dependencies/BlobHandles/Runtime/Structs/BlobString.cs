@@ -17,19 +17,19 @@ public struct BlobString : IDisposable, IEquatable<BlobString>
     public static Encoding Encoding { get; set; } = Encoding.ASCII;
 
     // Stores all of the bytes that represent this string
-    private readonly byte[] Bytes;
-    private readonly GCHandle byteHandle;
+    private readonly byte[] _bytes;
+    private readonly GCHandle _byteHandle;
 
     public readonly BlobHandle Handle;
 
-    public int Length => Bytes.Length;
+    public int Length => _bytes.Length;
 
     public unsafe BlobString(string source)
     {
         var byteCount = Encoding.GetByteCount(source);
-        Bytes = new byte[byteCount];
-        byteHandle = GCHandle.Alloc(Bytes, GCHandleType.Pinned);
-        byte* nativeBytesPtr = (byte*)byteHandle.AddrOfPinnedObject();
+        _bytes = new byte[byteCount];
+        _byteHandle = GCHandle.Alloc(_bytes, GCHandleType.Pinned);
+        byte* nativeBytesPtr = (byte*)_byteHandle.AddrOfPinnedObject();
 
         // write encoded string bytes directly to unmanaged memory
         fixed (char* strPtr = source)
@@ -42,8 +42,8 @@ public struct BlobString : IDisposable, IEquatable<BlobString>
     public unsafe BlobString(byte* sourcePtr, int length)
     {
         Handle = new BlobHandle(sourcePtr, length);
-        Bytes = Array.Empty<byte>();
-        byteHandle = new();
+        _bytes = Array.Empty<byte>();
+        _byteHandle = new();
     }
 
     public override unsafe string ToString()
@@ -80,9 +80,9 @@ public struct BlobString : IDisposable, IEquatable<BlobString>
 
     public void Dispose()
     {
-        if (byteHandle.IsAllocated)
+        if (_byteHandle.IsAllocated)
         {
-            byteHandle.Free();
+            _byteHandle.Free();
         }
     }
 }

@@ -10,55 +10,55 @@ namespace BuildSoft.OscCore.Tests;
 
 public class MessageReadPerformanceTests
 {
-    private const int k_Count = 4096;
-    private static readonly Stopwatch Stopwatch = new();
-    private int[] m_IntSourceData = new int[k_Count];
-    private float[] m_FloatSourceData = new float[k_Count];
-    private byte[] m_BigEndianIntSourceBytes = new byte[k_Count * 4];
-    private byte[] m_BigEndianFloatSourceBytes = new byte[k_Count * 4];
-    private byte[] m_MidiSourceBytes = null!;
-    private byte[] m_TimeSourceBytes = null!;
-    private List<GCHandle> m_Handles = new();
+    private const int Count = 4096;
+    private static readonly Stopwatch _stopwatch = new();
+    private int[] _intSourceData = new int[Count];
+    private float[] _floatSourceData = new float[Count];
+    private byte[] _bigEndianIntSourceBytes = new byte[Count * 4];
+    private byte[] _bigEndianFloatSourceBytes = new byte[Count * 4];
+    private byte[] _midiSourceBytes = null!;
+    private byte[] _timeSourceBytes = null!;
+    private List<GCHandle> _handles = new();
 
     [OneTimeSetUp]
     public void BeforeAll()
     {
-        m_Handles.Clear();
+        _handles.Clear();
 
-        m_Handles.Add(GCHandle.Alloc(m_BigEndianIntSourceBytes, GCHandleType.Pinned));
-        m_Handles.Add(GCHandle.Alloc(m_BigEndianFloatSourceBytes, GCHandleType.Pinned));
+        _handles.Add(GCHandle.Alloc(_bigEndianIntSourceBytes, GCHandleType.Pinned));
+        _handles.Add(GCHandle.Alloc(_bigEndianFloatSourceBytes, GCHandleType.Pinned));
 
-        m_MidiSourceBytes = TestUtil.RandomMidiBytes(k_Count * 4);
-        m_TimeSourceBytes = TestUtil.RandomTimestampBytes(k_Count * 4);
+        _midiSourceBytes = TestUtil.RandomMidiBytes(Count * 4);
+        _timeSourceBytes = TestUtil.RandomTimestampBytes(Count * 4);
 
-        for (int i = 0; i < m_IntSourceData.Length; i++)
-            m_IntSourceData[i] = TestUtil.SharedRandom.Next(-10000, 10000);
+        for (int i = 0; i < _intSourceData.Length; i++)
+            _intSourceData[i] = TestUtil.SharedRandom.Next(-10000, 10000);
 
-        for (int i = 0; i < m_FloatSourceData.Length; i++)
-            m_FloatSourceData[i] = (float)TestUtil.SharedRandom.NextDouble() * 200f - 100f;
+        for (int i = 0; i < _floatSourceData.Length; i++)
+            _floatSourceData[i] = (float)TestUtil.SharedRandom.NextDouble() * 200f - 100f;
     }
 
     [SetUp]
     public void BeforeEach()
     {
-        for (int i = 0; i < m_IntSourceData.Length; i++)
+        for (int i = 0; i < _intSourceData.Length; i++)
         {
-            var lBytes = BitConverter.GetBytes(m_IntSourceData[i]);
+            var lBytes = BitConverter.GetBytes(_intSourceData[i]);
             var bBytes = TestUtil.ReversedCopy(lBytes);
 
             var elementStart = i * 4;
             for (int j = 0; j < bBytes.Length; j++)
-                m_BigEndianIntSourceBytes[elementStart + j] = bBytes[j];
+                _bigEndianIntSourceBytes[elementStart + j] = bBytes[j];
         }
 
-        for (int i = 0; i < m_FloatSourceData.Length; i++)
+        for (int i = 0; i < _floatSourceData.Length; i++)
         {
-            var lBytes = BitConverter.GetBytes(m_FloatSourceData[i]);
+            var lBytes = BitConverter.GetBytes(_floatSourceData[i]);
             var bBytes = TestUtil.ReversedCopy(lBytes);
 
             var elementStart = i * 4;
             for (int j = 0; j < bBytes.Length; j++)
-                m_BigEndianFloatSourceBytes[elementStart + j] = bBytes[j];
+                _bigEndianFloatSourceBytes[elementStart + j] = bBytes[j];
         }
     }
 
@@ -79,125 +79,125 @@ public class MessageReadPerformanceTests
     public void ReadFloatElement_CheckedVsUnchecked()
     {
         const int count = 2048;
-        var values = FromBytes(m_BigEndianFloatSourceBytes, count, TypeTag.Float32);
+        var values = FromBytes(_bigEndianFloatSourceBytes, count, TypeTag.Float32);
 
         float value = 0f;
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             value = values.ReadFloatElement(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 4} elements, checked float32 element read: {Stopwatch.ElapsedTicks} ticks, last value {value}");
+        Debug.WriteLine($"{count / 4} elements, checked float32 element read: {_stopwatch.ElapsedTicks} ticks, last value {value}");
 
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             value = values.ReadFloatElementUnchecked(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 4} elements, unchecked float32 element read: {Stopwatch.ElapsedTicks} ticks, last value {value}");
+        Debug.WriteLine($"{count / 4} elements, unchecked float32 element read: {_stopwatch.ElapsedTicks} ticks, last value {value}");
     }
 
     [Test]
     public void ReadIntElement_CheckedVsUnchecked()
     {
         const int count = 2048;
-        var values = FromBytes(m_BigEndianIntSourceBytes, count, TypeTag.Int32);
+        var values = FromBytes(_bigEndianIntSourceBytes, count, TypeTag.Int32);
 
         float value = 0f;
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             value = values.ReadIntElement(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 4} elements, checked int32 element read: {Stopwatch.ElapsedTicks} ticks, last value {value}");
+        Debug.WriteLine($"{count / 4} elements, checked int32 element read: {_stopwatch.ElapsedTicks} ticks, last value {value}");
 
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             value = values.ReadIntElementUnchecked(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 4} elements, unchecked int32 element read: {Stopwatch.ElapsedTicks} ticks, last value {value}");
+        Debug.WriteLine($"{count / 4} elements, unchecked int32 element read: {_stopwatch.ElapsedTicks} ticks, last value {value}");
     }
 
     [Test]
     public void ReadMidiMessageElement_CheckedVsUnchecked()
     {
         const int count = 2048;
-        var values = FromBytes(m_MidiSourceBytes, count, TypeTag.MIDI);
-        Stopwatch.Restart();
+        var values = FromBytes(_midiSourceBytes, count, TypeTag.MIDI);
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             _ = values.ReadMidiElement(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 4} elements, checked MIDI element read: {Stopwatch.ElapsedTicks} ticks");
+        Debug.WriteLine($"{count / 4} elements, checked MIDI element read: {_stopwatch.ElapsedTicks} ticks");
 
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             _ = values.ReadMidiElementUnchecked(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 4} elements, unchecked MIDI element read: {Stopwatch.ElapsedTicks} ticks");
+        Debug.WriteLine($"{count / 4} elements, unchecked MIDI element read: {_stopwatch.ElapsedTicks} ticks");
     }
 
     [Test]
     public void ReadColor32MessageElement_CheckedVsUnchecked()
     {
         const int count = 2048;
-        var values = FromBytes(m_MidiSourceBytes, count, TypeTag.Color32);
+        var values = FromBytes(_midiSourceBytes, count, TypeTag.Color32);
 
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             _ = values.ReadColor32Element(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 4} elements, checked Color32 element read: {Stopwatch.ElapsedTicks} ticks");
+        Debug.WriteLine($"{count / 4} elements, checked Color32 element read: {_stopwatch.ElapsedTicks} ticks");
 
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             _ = values.ReadColor32ElementUnchecked(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 4} elements, unchecked Color32 element read: {Stopwatch.ElapsedTicks} ticks");
+        Debug.WriteLine($"{count / 4} elements, unchecked Color32 element read: {_stopwatch.ElapsedTicks} ticks");
     }
 
     [Test]
     public void ReadTimestampElement_CheckedVsUnchecked()
     {
         const int count = 2048;
-        var values = FromBytes(m_TimeSourceBytes, count, TypeTag.TimeTag);
+        var values = FromBytes(_timeSourceBytes, count, TypeTag.TimeTag);
 
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             _ = values.ReadTimestampElement(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 8} elements, checked NTP timestamp element read: {Stopwatch.ElapsedTicks} ticks");
+        Debug.WriteLine($"{count / 8} elements, checked NTP timestamp element read: {_stopwatch.ElapsedTicks} ticks");
 
-        Stopwatch.Restart();
+        _stopwatch.Restart();
         for (int i = 0; i < count; i++)
         {
             _ = values.ReadTimestampElementUnchecked(i);
         }
-        Stopwatch.Stop();
+        _stopwatch.Stop();
 
-        Debug.WriteLine($"{count / 8} elements, unchecked NTP timestamp element read: {Stopwatch.ElapsedTicks} ticks");
+        Debug.WriteLine($"{count / 8} elements, unchecked NTP timestamp element read: {_stopwatch.ElapsedTicks} ticks");
     }
 }

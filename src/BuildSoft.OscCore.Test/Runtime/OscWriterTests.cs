@@ -11,25 +11,25 @@ namespace BuildSoft.OscCore.Tests;
 
 public class OscWriterTests
 {
-    private readonly OscWriter m_Writer = new();
-    private int m_WriterLengthBefore;
+    private readonly OscWriter _writer = new();
+    private int _writerLengthBefore;
 
     [SetUp]
     public void BeforeEach()
     {
-        m_Writer.Reset();
-        m_WriterLengthBefore = m_Writer.Length;
+        _writer.Reset();
+        _writerLengthBefore = _writer.Length;
     }
 
     [TestCase(130)]
     [TestCase(144)]
     public void WriteInt32(int value)
     {
-        m_Writer.Write(value);
+        _writer.Write(value);
 
-        Assert.AreEqual(m_WriterLengthBefore + 4, m_Writer.Length);
+        Assert.AreEqual(_writerLengthBefore + 4, _writer.Length);
         // this tests both that it wrote to the right place in the buffer as well as that the value is right
-        var convertedBack = BitConverter.ToInt32(m_Writer.Buffer, m_WriterLengthBefore).ReverseBytes();
+        var convertedBack = BitConverter.ToInt32(_writer.Buffer, _writerLengthBefore).ReverseBytes();
 
         Assert.AreEqual(value, convertedBack);
     }
@@ -39,10 +39,10 @@ public class OscWriterTests
     [TestCase(144f)]
     public void WriteFloat32(float value)
     {
-        m_Writer.Write(value);
+        _writer.Write(value);
 
-        Assert.AreEqual(m_WriterLengthBefore + 4, m_Writer.Length);
-        var convertedBack = BitConverter.ToSingle(m_Writer.Buffer, m_WriterLengthBefore).ReverseBytes();
+        Assert.AreEqual(_writerLengthBefore + 4, _writer.Length);
+        var convertedBack = BitConverter.ToSingle(_writer.Buffer, _writerLengthBefore).ReverseBytes();
         Assert.AreEqual(value, convertedBack);
     }
 
@@ -51,14 +51,14 @@ public class OscWriterTests
     [TestCase("/composition/layers/2/video/blend")]
     public void WriteString(string value)
     {
-        m_Writer.Write(value);
+        _writer.Write(value);
 
         var asciiByteCount = Encoding.ASCII.GetByteCount(value);
         // strings align to 4 byte chunks like all other osc data types
         var alignedByteCount = (asciiByteCount + 3) & ~3;
-        Assert.AreEqual(m_WriterLengthBefore + alignedByteCount, m_Writer.Length);
+        Assert.AreEqual(_writerLengthBefore + alignedByteCount, _writer.Length);
 
-        var convertedBack = Encoding.ASCII.GetString(m_Writer.Buffer, m_WriterLengthBefore, asciiByteCount);
+        var convertedBack = Encoding.ASCII.GetString(_writer.Buffer, _writerLengthBefore, asciiByteCount);
         Assert.AreEqual(value, convertedBack);
     }
 
@@ -70,15 +70,15 @@ public class OscWriterTests
     {
         BlobString.Encoding = Encoding.ASCII;
         var blobStr = new BlobString(value);
-        m_Writer.Write(blobStr);
+        _writer.Write(blobStr);
 
         blobStr.Dispose();
         var asciiByteCount = Encoding.ASCII.GetByteCount(value);
         var alignedByteCount = (asciiByteCount + 3) & ~3;
         var expected = alignedByteCount == asciiByteCount ? asciiByteCount + 4 : alignedByteCount;
-        Assert.AreEqual(expected, m_Writer.Length);
+        Assert.AreEqual(expected, _writer.Length);
 
-        var convertedBack = Encoding.ASCII.GetString(m_Writer.Buffer, m_WriterLengthBefore, asciiByteCount);
+        var convertedBack = Encoding.ASCII.GetString(_writer.Buffer, _writerLengthBefore, asciiByteCount);
         Assert.AreEqual(value, convertedBack);
     }
 
@@ -88,27 +88,27 @@ public class OscWriterTests
     public void WriteBlob(int size)
     {
         var bytes = RandomBytes(size);
-        m_Writer.Write(bytes, size);
+        _writer.Write(bytes, size);
 
         var alignedByteCount = (size + 3) & ~3;
-        var blobContentIndex = m_WriterLengthBefore + 4;
+        var blobContentIndex = _writerLengthBefore + 4;
         var blobWriteEndIndex = blobContentIndex + size;
         // was the blob size written properly ?
-        var writtenSize = BitConverter.ToInt32(m_Writer.Buffer, m_WriterLengthBefore).ReverseBytes();
+        var writtenSize = BitConverter.ToInt32(_writer.Buffer, _writerLengthBefore).ReverseBytes();
         Assert.AreEqual(size, writtenSize);
-        Assert.AreEqual(blobContentIndex + alignedByteCount, m_Writer.Length);
+        Assert.AreEqual(blobContentIndex + alignedByteCount, _writer.Length);
 
         // were the blob contents written the same as the source ?
         for (int i = blobContentIndex; i < blobWriteEndIndex; i++)
         {
-            Assert.AreEqual(bytes[i - blobContentIndex], m_Writer.Buffer[i]);
+            Assert.AreEqual(bytes[i - blobContentIndex], _writer.Buffer[i]);
         }
 
         // did we write the necessary trailing bytes to align to the next 4 byte interval ?
         var zeroEndIndex = blobContentIndex + alignedByteCount;
         for (int i = blobWriteEndIndex; i < zeroEndIndex; i++)
         {
-            Assert.Zero(m_Writer.Buffer[i]);
+            Assert.Zero(_writer.Buffer[i]);
         }
     }
 
@@ -116,10 +116,10 @@ public class OscWriterTests
     [TestCase(144 * 100000)]
     public void WriteInt64(long value)
     {
-        m_Writer.Write(value);
+        _writer.Write(value);
 
-        Assert.AreEqual(m_WriterLengthBefore + 8, m_Writer.Length);
-        var bigEndian = BitConverter.ToInt64(m_Writer.Buffer, m_WriterLengthBefore);
+        Assert.AreEqual(_writerLengthBefore + 8, _writer.Length);
+        var bigEndian = BitConverter.ToInt64(_writer.Buffer, _writerLengthBefore);
         var convertedBack = IPAddress.NetworkToHostOrder(bigEndian);
         Assert.AreEqual(value, convertedBack);
     }
@@ -129,10 +129,10 @@ public class OscWriterTests
     [TestCase(144.1d * 1000d)]
     public void WriteFloat64(double value)
     {
-        m_Writer.Write(value);
+        _writer.Write(value);
 
-        Assert.AreEqual(m_WriterLengthBefore + 8, m_Writer.Length);
-        var convertedBack = BitConverter.ToDouble(m_Writer.Buffer, m_WriterLengthBefore).ReverseBytes();
+        Assert.AreEqual(_writerLengthBefore + 8, _writer.Length);
+        var convertedBack = BitConverter.ToDouble(_writer.Buffer, _writerLengthBefore).ReverseBytes();
         Assert.AreEqual(value, convertedBack);
     }
 
@@ -142,13 +142,13 @@ public class OscWriterTests
     public void WriteColor32(byte r, byte g, byte b, byte a)
     {
         var value = new Color32(r, g, b, a);
-        m_Writer.Write(value);
+        _writer.Write(value);
 
-        Assert.AreEqual(m_WriterLengthBefore + 4, m_Writer.Length);
-        var bR = m_Writer.Buffer[m_WriterLengthBefore + 3];
-        var bG = m_Writer.Buffer[m_WriterLengthBefore + 2];
-        var bB = m_Writer.Buffer[m_WriterLengthBefore + 1];
-        var bA = m_Writer.Buffer[m_WriterLengthBefore];
+        Assert.AreEqual(_writerLengthBefore + 4, _writer.Length);
+        var bR = _writer.Buffer[_writerLengthBefore + 3];
+        var bG = _writer.Buffer[_writerLengthBefore + 2];
+        var bB = _writer.Buffer[_writerLengthBefore + 1];
+        var bA = _writer.Buffer[_writerLengthBefore];
         var convertedBack = new Color32(bR, bG, bB, bA);
         Assert.AreEqual(value, convertedBack);
     }
@@ -157,10 +157,10 @@ public class OscWriterTests
     public void WriteMidi()
     {
         var value = new MidiMessage(1, 4, 16, 80);
-        m_Writer.Write(value);
+        _writer.Write(value);
 
-        Assert.AreEqual(m_WriterLengthBefore + 4, m_Writer.Length);
-        var convertedBack = new MidiMessage(m_Writer.Buffer, m_WriterLengthBefore);
+        Assert.AreEqual(_writerLengthBefore + 4, _writer.Length);
+        var convertedBack = new MidiMessage(_writer.Buffer, _writerLengthBefore);
         Assert.True(value == convertedBack);
     }
 
@@ -169,10 +169,10 @@ public class OscWriterTests
     [TestCase('C')]
     public void WriteAsciiChar(char chr)
     {
-        m_Writer.Write(chr);
+        _writer.Write(chr);
 
-        Assert.AreEqual(m_WriterLengthBefore + 4, m_Writer.Length);
-        var convertedBack = (char)m_Writer.Buffer[m_WriterLengthBefore + 3];
+        Assert.AreEqual(_writerLengthBefore + 4, _writer.Length);
+        var convertedBack = (char)_writer.Buffer[_writerLengthBefore + 3];
         Assert.True(chr == convertedBack);
     }
 
@@ -180,10 +180,10 @@ public class OscWriterTests
     public void WriteTimestamp()
     {
         var stamp = new NtpTimestamp(DateTime.Now);
-        m_Writer.Write(stamp);
+        _writer.Write(stamp);
 
-        Assert.AreEqual(m_WriterLengthBefore + 8, m_Writer.Length);
-        var convertedBack = NtpTimestamp.FromBigEndianBytes(m_Writer.Buffer, m_WriterLengthBefore);
+        Assert.AreEqual(_writerLengthBefore + 8, _writer.Length);
+        var convertedBack = NtpTimestamp.FromBigEndianBytes(_writer.Buffer, _writerLengthBefore);
         Assert.True(stamp == convertedBack);
     }
 
@@ -191,11 +191,11 @@ public class OscWriterTests
     public void WriteVector2()
     {
         var data = new Vector2(2.5f, 1.01f);
-        m_Writer.Write(data);
+        _writer.Write(data);
 
-        Assert.AreEqual(m_WriterLengthBefore + 8, m_Writer.Length);
-        var readX = BitConverter.ToSingle(m_Writer.Buffer, m_WriterLengthBefore).ReverseBytes();
-        var readY = BitConverter.ToSingle(m_Writer.Buffer, m_WriterLengthBefore + 4).ReverseBytes();
+        Assert.AreEqual(_writerLengthBefore + 8, _writer.Length);
+        var readX = BitConverter.ToSingle(_writer.Buffer, _writerLengthBefore).ReverseBytes();
+        var readY = BitConverter.ToSingle(_writer.Buffer, _writerLengthBefore + 4).ReverseBytes();
         Assert.True(data == new Vector2(readX, readY));
     }
 
@@ -203,12 +203,12 @@ public class OscWriterTests
     public void WriteVector3()
     {
         var data = new Vector3(0.15f, -4.2f, 1f);
-        m_Writer.Write(data);
+        _writer.Write(data);
 
-        Assert.AreEqual(m_WriterLengthBefore + 12, m_Writer.Length);
-        var readX = BitConverter.ToSingle(m_Writer.Buffer, m_WriterLengthBefore).ReverseBytes();
-        var readY = BitConverter.ToSingle(m_Writer.Buffer, m_WriterLengthBefore + 4).ReverseBytes();
-        var readZ = BitConverter.ToSingle(m_Writer.Buffer, m_WriterLengthBefore + 8).ReverseBytes();
+        Assert.AreEqual(_writerLengthBefore + 12, _writer.Length);
+        var readX = BitConverter.ToSingle(_writer.Buffer, _writerLengthBefore).ReverseBytes();
+        var readY = BitConverter.ToSingle(_writer.Buffer, _writerLengthBefore + 4).ReverseBytes();
+        var readZ = BitConverter.ToSingle(_writer.Buffer, _writerLengthBefore + 8).ReverseBytes();
         Assert.True(data == new Vector3(readX, readY, readZ));
     }
 

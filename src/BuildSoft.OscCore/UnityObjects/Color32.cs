@@ -10,7 +10,9 @@ namespace BuildSoft.OscCore.UnityObjects;
 public struct Color32
 {
     [FieldOffset(0)]
+#pragma warning disable IDE1006 // Naming style
     private readonly int rgba;
+#pragma warning restore IDE1006 // Naming style
 
     [FieldOffset(0)]
     public byte r;
