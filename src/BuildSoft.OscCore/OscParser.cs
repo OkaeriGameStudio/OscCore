@@ -105,21 +105,11 @@ public unsafe class OscParser
 
     internal static bool CharacterIsValidInAddress(char c)
     {
-        switch (c)
+        return c switch
         {
-            case ' ':
-            case '#':
-            case '*':
-            case ',':
-            case '?':
-            case '[':
-            case ']':
-            case '{':
-            case '}':
-                return false;
-            default:
-                return true;
-        }
+            ' ' or '#' or '*' or ',' or '?' or '[' or ']' or '{' or '}' => false,
+            _ => true,
+        };
     }
 
     internal static AddressType GetAddressType(string address)

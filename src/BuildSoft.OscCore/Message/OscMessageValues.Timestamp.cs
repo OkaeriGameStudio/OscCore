@@ -15,13 +15,11 @@ public sealed unsafe partial class OscMessageValues
 #if OSCCORE_SAFETY_CHECKS
         if (OutOfBounds(index)) return default;
 #endif
-        switch (_tags[index])
+        return _tags[index] switch
         {
-            case TypeTag.TimeTag:
-                return NtpTimestamp.FromBigEndianBytes(_sharedBufferPtr + _offsets[index]);
-            default:
-                throw new InvalidOperationException();
-        }
+            TypeTag.TimeTag => NtpTimestamp.FromBigEndianBytes(_sharedBufferPtr + _offsets[index]),
+            _ => throw new InvalidOperationException()
+        };
     }
 
     /// <summary>

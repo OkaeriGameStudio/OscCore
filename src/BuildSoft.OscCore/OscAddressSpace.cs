@@ -76,13 +76,11 @@ public sealed class OscAddressSpace
         if (string.IsNullOrEmpty(address))
             return false;
 
-        switch (OscParser.GetAddressType(address))
+        return OscParser.GetAddressType(address) switch
         {
-            case AddressType.Address:
-                return _addressToMethod.RemoveAddress(address);
-            default:
-                return false;
-        }
+            AddressType.Address => _addressToMethod.RemoveAddress(address),
+            _ => false,
+        };
     }
 
     public bool RemoveMethod(string address, OscActionPair onReceived)
