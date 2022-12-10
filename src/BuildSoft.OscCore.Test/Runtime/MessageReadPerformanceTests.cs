@@ -12,13 +12,13 @@ public class MessageReadPerformanceTests
 {
     private const int Count = 4096;
     private static readonly Stopwatch _stopwatch = new();
-    private int[] _intSourceData = new int[Count];
-    private float[] _floatSourceData = new float[Count];
-    private byte[] _bigEndianIntSourceBytes = new byte[Count * 4];
-    private byte[] _bigEndianFloatSourceBytes = new byte[Count * 4];
-    private byte[] _midiSourceBytes = null!;
-    private byte[] _timeSourceBytes = null!;
-    private List<GCHandle> _handles = new();
+    private readonly int[] _intSourceData = new int[Count];
+    private readonly float[] _floatSourceData = new float[Count];
+    private readonly byte[] _bigEndianIntSourceBytes = new byte[Count * 4];
+    private readonly byte[] _bigEndianFloatSourceBytes = new byte[Count * 4];
+    private readonly byte[] _midiSourceBytes = TestUtil.RandomMidiBytes(Count * 4);
+    private readonly byte[] _timeSourceBytes = TestUtil.RandomTimestampBytes(Count * 4);
+    private readonly List<GCHandle> _handles = new();
 
     [OneTimeSetUp]
     public void BeforeAll()
@@ -27,9 +27,6 @@ public class MessageReadPerformanceTests
 
         _handles.Add(GCHandle.Alloc(_bigEndianIntSourceBytes, GCHandleType.Pinned));
         _handles.Add(GCHandle.Alloc(_bigEndianFloatSourceBytes, GCHandleType.Pinned));
-
-        _midiSourceBytes = TestUtil.RandomMidiBytes(Count * 4);
-        _timeSourceBytes = TestUtil.RandomTimestampBytes(Count * 4);
 
         for (int i = 0; i < _intSourceData.Length; i++)
             _intSourceData[i] = TestUtil.SharedRandom.Next(-10000, 10000);
