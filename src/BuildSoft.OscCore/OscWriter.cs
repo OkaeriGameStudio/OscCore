@@ -9,22 +9,7 @@ namespace BuildSoft.OscCore;
 
 public sealed unsafe class OscWriter : IDisposable
 {
-    public readonly byte[] Buffer;
-    readonly byte* _bufferPtr;
-    readonly GCHandle _bufferHandle;
-    readonly MidiMessage* _bufferMidiPtr;
-
-    readonly float[] _floatSwap = new float[1];
-    readonly byte* _floatSwapPtr;
-    readonly GCHandle _floatSwapHandle;
-
-    readonly double[] _doubleSwap = new double[1];
-    readonly byte* _doubleSwapPtr;
-    readonly GCHandle _doubleSwapHandle;
-
-    readonly Color32[] _color32Swap = new Color32[1];
-    readonly byte* _color32SwapPtr;
-    readonly GCHandle _color32SwapHandle;
+    public byte[] Buffer { get; }
 
     int _length;
 
@@ -34,14 +19,6 @@ public sealed unsafe class OscWriter : IDisposable
     public OscWriter(int capacity = 4096)
     {
         Buffer = new byte[capacity];
-
-        // Even though Unity's GC does not move objects around, pin them to be safe.
-        _bufferPtr = Utils.PinPtr<byte, byte>(Buffer, out _bufferHandle);
-        _bufferMidiPtr = (MidiMessage*)_bufferPtr;
-
-        _floatSwapPtr = Utils.PinPtr<float, byte>(_floatSwap, out _floatSwapHandle);
-        _doubleSwapPtr = Utils.PinPtr<double, byte>(_doubleSwap, out _doubleSwapHandle);
-        _color32SwapPtr = Utils.PinPtr<Color32, byte>(_color32Swap, out _color32SwapHandle);
     }
 
     ~OscWriter() { Dispose(); }
@@ -49,23 +26,73 @@ public sealed unsafe class OscWriter : IDisposable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Reset() { _length = 0; }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void WriteToBigEndian(byte* bytes, int length)
+    {
+        int offset = _length;
+        _length += length;
+        if (!BitConverter.IsLittleEndian)
+        {
+            fixed (byte* dest = &Buffer[offset])
+            {
+                System.Buffer.MemoryCopy(bytes, dest, length, length);
+            }
+        }
+
+        if (length == 0)
+        {
+            return;
+        }
+        if (length == 4)
+        {
+            fixed (byte* dest = &Buffer[offset])
+            {
+                dest[0] = bytes[3];
+                dest[1] = bytes[2];
+                dest[2] = bytes[1];
+                dest[3] = bytes[0];
+            }
+            return;
+        }
+        if (length == 8)
+        {
+            fixed (byte* dest = &Buffer[offset])
+            {
+                dest[0] = bytes[7];
+                dest[1] = bytes[6];
+                dest[2] = bytes[5];
+                dest[3] = bytes[4];
+                dest[4] = bytes[3];
+                dest[5] = bytes[2];
+                dest[6] = bytes[1];
+                dest[7] = bytes[0];
+            }
+            return;
+        }
+        WriteAsLittleEndianWithLoop(bytes, length, offset);
+    }
+
+    private void WriteAsLittleEndianWithLoop(byte* bytes, int length, int bufferOffset)
+    {
+        fixed (byte* dest = &Buffer[bufferOffset])
+        {
+            for (int i = 0; i < length; i++)
+            {
+                dest[i] = bytes[length - i];
+            }
+        }
+    }
+
     /// <summary>Write a 32-bit integer element</summary>
     public void Write(int data)
     {
-        Buffer[_length++] = (byte)(data >> 24);
-        Buffer[_length++] = (byte)(data >> 16);
-        Buffer[_length++] = (byte)(data >> 8);
-        Buffer[_length++] = (byte)(data);
+        WriteToBigEndian((byte*)&data, sizeof(int));
     }
 
     /// <summary>Write a 32-bit floating point element</summary>
     public void Write(float data)
     {
-        _floatSwap[0] = data;
-        Buffer[_length++] = _floatSwapPtr[3];
-        Buffer[_length++] = _floatSwapPtr[2];
-        Buffer[_length++] = _floatSwapPtr[1];
-        Buffer[_length++] = _floatSwapPtr[0];
+        WriteToBigEndian((byte*)&data, sizeof(float));
     }
 
     /// <summary>Write a 2D vector as two float elements</summary>
@@ -103,7 +130,10 @@ public sealed unsafe class OscWriter : IDisposable
     public void Write(BlobString data)
     {
         var strLength = data.Length;
-        System.Buffer.MemoryCopy(data.Handle.Pointer, _bufferPtr + _length, strLength, strLength);
+        fixed (byte* buffer = &Buffer[_length])
+        {
+            System.Buffer.MemoryCopy(data.Handle.Pointer, buffer, strLength, strLength);
+        }
         _length += strLength;
 
         var alignedLength = (data.Length + 3) & ~3;
@@ -138,55 +168,39 @@ public sealed unsafe class OscWriter : IDisposable
     /// <summary>Write a 64-bit integer element</summary>
     public void Write(long data)
     {
-        var buffer = Buffer;
-        buffer[_length++] = (byte)(data >> 56);
-        buffer[_length++] = (byte)(data >> 48);
-        buffer[_length++] = (byte)(data >> 40);
-        buffer[_length++] = (byte)(data >> 32);
-        buffer[_length++] = (byte)(data >> 24);
-        buffer[_length++] = (byte)(data >> 16);
-        buffer[_length++] = (byte)(data >> 8);
-        buffer[_length++] = (byte)(data);
+        WriteToBigEndian((byte*)&data, sizeof(long));
     }
 
     /// <summary>Write a 64-bit floating point element</summary>
     public void Write(double data)
     {
-        var buffer = Buffer;
-        _doubleSwap[0] = data;
-        var dsPtr = _doubleSwapPtr;
-        buffer[_length++] = dsPtr[7];
-        buffer[_length++] = dsPtr[6];
-        buffer[_length++] = dsPtr[5];
-        buffer[_length++] = dsPtr[4];
-        buffer[_length++] = dsPtr[3];
-        buffer[_length++] = dsPtr[2];
-        buffer[_length++] = dsPtr[1];
-        buffer[_length++] = dsPtr[0];
+        WriteToBigEndian((byte*)&data, sizeof(double));
     }
 
     /// <summary>Write a 32-bit RGBA color element</summary>
     public void Write(Color32 data)
     {
-        _color32Swap[0] = data;
-        Buffer[_length++] = _color32SwapPtr[3];
-        Buffer[_length++] = _color32SwapPtr[2];
-        Buffer[_length++] = _color32SwapPtr[1];
-        Buffer[_length++] = _color32SwapPtr[0];
+        WriteToBigEndian((byte*)&data, sizeof(Color32));
     }
 
     /// <summary>Write a MIDI message element</summary>
     public void Write(MidiMessage data)
     {
-        var midiWritePtr = (MidiMessage*)(_bufferPtr + _length);
-        *midiWritePtr = data;
+        fixed (byte* buffer = &Buffer[_length])
+        {
+            var midiWritePtr = (MidiMessage*)buffer;
+            *midiWritePtr = data;
+        }
         _length += 4;
     }
 
     /// <summary>Write a 64-bit NTP timestamp element</summary>
     public void Write(NtpTimestamp time)
     {
-        time.ToBigEndianBytes((uint*)(_bufferPtr + _length));
+        fixed (byte* buffer = &Buffer[_length])
+        {
+            time.ToBigEndianBytes((uint*)buffer);
+        }
         _length += 8;
     }
 
@@ -228,7 +242,10 @@ public sealed unsafe class OscWriter : IDisposable
             Buffer[_length++] = 0;
 
         // write the 4 bytes for the type tags
-        ((uint*)(_bufferPtr + _length))[0] = tags;
+        fixed (byte* buffer = &Buffer[_length])
+        {
+            *(uint*)buffer = tags;
+        }
         _length += 4;
     }
 
@@ -239,9 +256,6 @@ public sealed unsafe class OscWriter : IDisposable
 
     public void Dispose()
     {
-        _bufferHandle.SafeFree();
-        _color32SwapHandle.SafeFree();
-        _floatSwapHandle.SafeFree();
-        _doubleSwapHandle.SafeFree();
+
     }
 }
