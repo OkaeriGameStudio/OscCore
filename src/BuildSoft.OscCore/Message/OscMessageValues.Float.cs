@@ -20,16 +20,16 @@ public sealed unsafe partial class OscMessageValues
         {
             case TypeTag.Float32:
                 ConvertBuffer buffer = new();
-                buffer.Bits32[0] = _sharedBufferPtr[offset + 3];
-                buffer.Bits32[1] = _sharedBufferPtr[offset + 2];
-                buffer.Bits32[2] = _sharedBufferPtr[offset + 1];
-                buffer.Bits32[3] = _sharedBufferPtr[offset];
+                buffer.Bits32[0] = _sharedBuffer[offset + 3];
+                buffer.Bits32[1] = _sharedBuffer[offset + 2];
+                buffer.Bits32[2] = _sharedBuffer[offset + 1];
+                buffer.Bits32[3] = _sharedBuffer[offset];
                 return buffer.@float;
             case TypeTag.Int32:
-                return _sharedBufferPtr[index] << 24 |
-                       _sharedBufferPtr[index + 1] << 16 |
-                       _sharedBufferPtr[index + 2] << 8 |
-                       _sharedBufferPtr[index + 3];
+                return _sharedBuffer[index] << 24 |
+                       _sharedBuffer[index + 1] << 16 |
+                       _sharedBuffer[index + 2] << 8 |
+                       _sharedBuffer[index + 3];
             default:
                 throw new InvalidOperationException();
         }
@@ -50,10 +50,10 @@ public sealed unsafe partial class OscMessageValues
 #endif
         var offset = _offsets[index];
         ConvertBuffer buffer = new();
-        buffer.Bits32[0] = _sharedBufferPtr[offset + 3];
-        buffer.Bits32[1] = _sharedBufferPtr[offset + 2];
-        buffer.Bits32[2] = _sharedBufferPtr[offset + 1];
-        buffer.Bits32[3] = _sharedBufferPtr[offset];
+        buffer.Bits32[0] = _sharedBuffer[offset + 3];
+        buffer.Bits32[1] = _sharedBuffer[offset + 2];
+        buffer.Bits32[2] = _sharedBuffer[offset + 1];
+        buffer.Bits32[3] = _sharedBuffer[offset];
         return buffer.@float;
     }
 }

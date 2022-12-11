@@ -22,8 +22,9 @@ public sealed unsafe partial class OscMessageValues
         switch (_tags[index])
         {
             case TypeTag.Int64:
-                // TODO - optimize
-                long bigEndian = *(_sharedBufferPtr + offset);
+                long bigEndian;
+                fixed (byte* p = &_sharedBuffer[offset])
+                    bigEndian = *(long*)p;
                 return IPAddress.NetworkToHostOrder(bigEndian);
             case TypeTag.Int32:
                 return _sharedBuffer[offset] << 24 |
@@ -64,7 +65,9 @@ public sealed unsafe partial class OscMessageValues
 #if OSCCORE_SAFETY_CHECKS
         if (OutOfBounds(index)) return default;
 #endif
-        long bigEndian = *(_sharedBufferPtr + _offsets[index]);
+        long bigEndian;
+        fixed (byte* p = &_sharedBuffer[_offsets[index]])
+            bigEndian = *(long*)p;
         return IPAddress.NetworkToHostOrder(bigEndian);
     }
 }

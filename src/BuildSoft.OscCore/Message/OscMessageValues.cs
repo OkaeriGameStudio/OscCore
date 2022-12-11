@@ -35,7 +35,6 @@ public sealed unsafe partial class OscMessageValues
 
     // the buffer where we read messages from - usually provided + filled by a socket reader
     private readonly byte[] _sharedBuffer;
-    private readonly byte* _sharedBufferPtr;
 
     /// <summary>
     /// All type tags in the message.
@@ -58,8 +57,6 @@ public sealed unsafe partial class OscMessageValues
         _tags = new TypeTag[elementCapacity];
         _offsets = new int[elementCapacity];
         _sharedBuffer = buffer;
-
-        fixed (byte* bufferPtr = buffer) { _sharedBufferPtr = bufferPtr; }
     }
 
     /// <summary>Execute a method for every element in the message</summary>

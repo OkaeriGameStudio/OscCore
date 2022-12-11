@@ -20,7 +20,10 @@ public sealed unsafe partial class OscMessageValues
         switch (_tags[index])
         {
             case TypeTag.MIDI:
-                return *(MidiMessage*)(_sharedBufferPtr + _offsets[index]);
+                fixed (byte* bufPtr = &_sharedBuffer[_offsets[index]])
+                {
+                    return *(MidiMessage*)bufPtr;
+                }
             default:
                 throw new InvalidOperationException();
         }
@@ -39,6 +42,9 @@ public sealed unsafe partial class OscMessageValues
 #if OSCCORE_SAFETY_CHECKS
         if (OutOfBounds(index)) return default;
 #endif
-        return *(MidiMessage*)(_sharedBufferPtr + _offsets[index]);
+        fixed (byte* p = &_sharedBuffer[_offsets[index]])
+        {
+            return *(MidiMessage*)p;
+        }
     }
 }

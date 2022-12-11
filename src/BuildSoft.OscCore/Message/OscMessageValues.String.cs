@@ -77,8 +77,11 @@ public sealed unsafe partial class OscMessageValues
                 return buffer.Color32.ToString();
 
             case TypeTag.MIDI:
-                var midiPtr = _sharedBufferPtr + offset;
-                var midi = *(MidiMessage*)midiPtr;
+                MidiMessage midi;
+                fixed (byte* p = &_sharedBuffer[offset])
+                {
+                    midi = *(MidiMessage*)p;
+                }
                 return midi.ToString();
             case TypeTag.AsciiChar32:
                 // ascii chars are encoded in the last byte of the 4-byte block
