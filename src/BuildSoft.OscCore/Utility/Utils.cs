@@ -18,8 +18,8 @@ internal static class Utils
     {
         if (string.IsNullOrEmpty(address))
             address = "/";
-        if (address[0] != '/') address =
-             address.Insert(0, "/");
+        if (address[0] != '/')
+            address = address.Insert(0, "/");
         if (address.EndsWith(" "))
             address = address.TrimEnd(' ');
 

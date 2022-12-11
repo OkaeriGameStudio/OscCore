@@ -63,24 +63,24 @@ internal static class TagsTestData
             var expected1 = new[] { TypeTag.Float32, TypeTag.Float32, TypeTag.Int32, TypeTag.String };
             var bytes1 = new[]
             {
-                    (byte) ',', (byte) TypeTag.Float32, (byte) TypeTag.Float32, (byte) TypeTag.Int32,
-                    (byte) TypeTag.String, (byte) 0, (byte) 0, (byte) 0
-                };
+                (byte)',', (byte)TypeTag.Float32, (byte)TypeTag.Float32, (byte)TypeTag.Int32,
+                (byte)TypeTag.String, (byte)0, (byte)0, (byte)0
+            };
 
             yield return new TypeTagParseTestCase(bytes1, 0, expected1);
 
             var expected2 = new[]
             {
-                    TypeTag.Int32, TypeTag.Float32, TypeTag.String, TypeTag.String, TypeTag.Blob, TypeTag.Int32
-                };
+                TypeTag.Int32, TypeTag.Float32, TypeTag.String, TypeTag.String, TypeTag.Blob, TypeTag.Int32
+            };
             var bytes2 = new[]
             {
-                    (byte) 0, (byte) 0, // offset of 2 bytes
-                    (byte) ',',
-                    (byte) TypeTag.Int32, (byte) TypeTag.Float32, (byte) TypeTag.String,
-                    (byte) TypeTag.String, (byte) TypeTag.Blob, (byte) TypeTag.Int32,
-                    (byte) 0, (byte) 0 // trailing bytes
-                };
+                (byte)0, (byte)0, // offset of 2 bytes
+                (byte)',',
+                (byte)TypeTag.Int32, (byte)TypeTag.Float32, (byte)TypeTag.String,
+                (byte)TypeTag.String, (byte)TypeTag.Blob, (byte)TypeTag.Int32,
+                (byte)0, (byte)0 // trailing bytes
+            };
 
             yield return new TypeTagParseTestCase(bytes2, 2, expected2);
         }
@@ -95,30 +95,30 @@ internal static class MidiTestData
         {
             var expected1 = new[]
             {
-                    (byte)1,                     // port id
-                    (byte)144,                   // status - ch1 note on
-                    (byte) 60,                   // note # - 60 = middle c
-                    (byte)100                    // note velocity
-                };
+                (byte)1,                     // port id
+                (byte)144,                   // status - ch1 note on
+                (byte)60,                    // note # - 60 = middle c
+                (byte)100                    // note velocity
+            };
             var bytes1 = new[]
             {
-                    (byte) 0, (byte) 0, (byte) 1, (byte) 144,
-                    (byte) 60, (byte) 100, (byte) 0, (byte) 0,
-                };
+                (byte)0, (byte)0, (byte)1, (byte)144,
+                (byte)60, (byte)100, (byte)0, (byte)0,
+            };
 
             yield return new TestCaseData(bytes1, 2, expected1);
 
             var expected2 = new[]
             {
-                    (byte) 16,
-                    (byte) 128,                  // status - ch1 note off
-                    (byte) 72,                   // note C4
-                    (byte) 42,
-                };
+                (byte)16,
+                (byte)128,                  // status - ch1 note off
+                (byte)72,                   // note C4
+                (byte)42,
+            };
             var bytes2 = new[]
             {
-                    (byte) 16, (byte) 128, (byte) 72, (byte) 42, (byte) 0, (byte) 0
-                };
+                (byte)16, (byte)128, (byte)72, (byte)42, (byte)0, (byte)0
+            };
 
             yield return new TestCaseData(bytes2, 0, expected2);
         }
