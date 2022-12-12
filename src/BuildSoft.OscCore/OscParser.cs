@@ -9,8 +9,6 @@ public unsafe class OscParser
     public const int MaxBlobSize = 1024 * 256;
 
     internal readonly byte[] _buffer;
-    internal readonly byte* _bufferPtr;
-    internal readonly long* _bufferLongPtr;
 
     /// <summary>
     /// Holds all parsed values.  After calling Parse(), this should have data available to read
@@ -22,11 +20,6 @@ public unsafe class OscParser
     public OscParser(byte[] fixedBuffer)
     {
         _buffer = fixedBuffer;
-        fixed (byte* ptr = fixedBuffer)
-        {
-            _bufferPtr = ptr;
-            _bufferLongPtr = (long*)ptr;
-        }
         MessageValues = new OscMessageValues(_buffer, MaxElementsPerMessage);
     }
 
@@ -176,7 +169,7 @@ public unsafe class OscParser
 
     public int FindUnalignedAddressLength()
     {
-        if (_bufferPtr[0] != Constant.ForwardSlash)
+        if (_buffer[0] != Constant.ForwardSlash)
             return -1;
 
         var index = 1;
@@ -184,13 +177,13 @@ public unsafe class OscParser
         {
             index++;
         }
-        while (_bufferPtr[index] != byte.MinValue);
+        while (_buffer[index] != byte.MinValue);
         return index;
     }
 
     public int FindUnalignedAddressLength(int offset)
     {
-        if (_bufferPtr[offset] != Constant.ForwardSlash)
+        if (_buffer[offset] != Constant.ForwardSlash)
             return -1;
 
         var index = offset + 1;
@@ -198,7 +191,7 @@ public unsafe class OscParser
         {
             index++;
         }
-        while (_bufferPtr[index] != byte.MinValue);
+        while (_buffer[index] != byte.MinValue);
 
         var length = index - offset;
         return length;
@@ -247,7 +240,10 @@ public unsafe class OscParser
                     break;
                 case TypeTag.Blob:
                     // read the int that specifies the size of the blob
-                    offset += 4 + *(int*)(_bufferPtr + offset);
+                    fixed (byte* bytes = &_buffer[offset])
+                    {
+                        offset += 4 + *(int*)bytes;
+                    }
                     break;
             }
         }
@@ -261,7 +257,10 @@ public unsafe class OscParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsBundleTagAtIndex(int index)
     {
-        return *((long*)_bufferPtr + index) == Constant.BundlePrefixLong;
+        fixed (byte* buffer = &_buffer[index])
+        {
+            return *(long*)buffer == Constant.BundlePrefixLong;
+        }
     }
 
     public static int FindArrayLength(byte[] bytes, int offset = 0)

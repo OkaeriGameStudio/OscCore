@@ -15,8 +15,6 @@ public sealed unsafe class OscServer : IDisposable
     private bool _disposed;
     private bool _started;
     private readonly byte[] _readBuffer;
-    private GCHandle _bufferHandle;
-    private readonly byte* _bufferPtr;
     private Action?[] _mainThreadQueue = new Action[16];
     private int _mainThreadCount;
     private readonly Dictionary<int, string> _byteLengthToStringBuffer = new();
@@ -45,8 +43,6 @@ public sealed unsafe class OscServer : IDisposable
         AddressSpace = new OscAddressSpace();
 
         _readBuffer = new byte[bufferSize];
-        _bufferHandle = GCHandle.Alloc(_readBuffer, GCHandleType.Pinned);
-        _bufferPtr = (byte*)_bufferHandle.AddrOfPinnedObject();
         Parser = new OscParser(_readBuffer);
 
         Port = port;
@@ -207,91 +203,92 @@ public sealed unsafe class OscServer : IDisposable
     /// <param name="byteLength">The length of the received message</param>
     public void ParseBuffer(int byteLength)
     {
-        var bufferPtr = Parser._bufferPtr;
-        var bufferLongPtr = Parser._bufferLongPtr;
         var parser = Parser;
-        var addressToMethod = AddressSpace._addressToMethod;
-
-        // determine if the message is a bundle or not 
-        if (*bufferLongPtr != Constant.BundlePrefixLong)
+        fixed (byte* bufferPtr = parser._buffer)
         {
-            // address length here doesn't include the null terminator and alignment padding.
-            // this is so we can look up the address by only its content bytes.
-            // var addressLength = parser.FindUnalignedAddressLength();
-            var addressLength = parser.Parse();
-            if (addressLength < 0)
-                return;    // address didn't start with '/'
+            var addressToMethod = AddressSpace._addressToMethod;
 
-            // see if we have a method registered for this address
-            if (addressToMethod.TryGetValueFromBytes(bufferPtr, addressLength, out var methodPair))
+            // determine if the message is a bundle or not 
+            if (*(long*)bufferPtr != Constant.BundlePrefixLong)
             {
-                HandleCallbacks(methodPair, parser.MessageValues);
-            }
-            else if (AddressSpace._patternCount > 0)
-            {
-                TryMatchPatterns(parser, bufferPtr, addressLength);
-            }
+                // address length here doesn't include the null terminator and alignment padding.
+                // this is so we can look up the address by only its content bytes.
+                // var addressLength = parser.FindUnalignedAddressLength();
+                var addressLength = parser.Parse();
+                if (addressLength < 0)
+                    return;    // address didn't start with '/'
 
-            if (_monitorCallbacks.Count > 0)
-                HandleMonitorCallbacks(bufferPtr, addressLength, parser);
-
-            return;
-        }
-
-        // the message is a bundle, so we need to recursively scan the bundle elements
-        int MessageOffset = 0;
-        bool recurse;
-        // the outer do-while loop runs once for every #bundle encountered
-        do
-        {
-            // Timestamp isn't used yet, but it will be eventually
-            // var time = parser.MessageValues.ReadTimestampIndex(MessageOffset + 8);
-            // '#bundle ' + timestamp = 16 bytes
-            MessageOffset += 16;
-            recurse = false;
-
-            // the inner while loop runs once per bundle element
-            while (MessageOffset < byteLength && !recurse)
-            {
-                var messageSize = (int)parser.MessageValues.ReadUIntIndex(MessageOffset);
-                var contentIndex = MessageOffset + 4;
-
-                if (parser.IsBundleTagAtIndex(contentIndex))
+                // see if we have a method registered for this address
+                if (addressToMethod.TryGetValueFromBytes(bufferPtr, addressLength, out var methodPair))
                 {
-                    // this bundle element's contents are a bundle, break out to the outer loop to scan it
-                    MessageOffset = contentIndex;
-                    recurse = true;
-                    continue;
+                    HandleCallbacks(methodPair, parser.MessageValues);
                 }
-
-                // parse the actual contents of this bundle element just like a non-bundled message
-                var bundleAddressLength = parser.Parse(contentIndex);
-                if (bundleAddressLength <= 0)
-                {
-                    // if an error occured parsing the content, skip this messagse entirely
-                    MessageOffset += messageSize + 4;
-                    continue;
-                }
-
-                var contentPtr = bufferPtr + contentIndex;
-                if (addressToMethod.TryGetValueFromBytes(contentPtr, bundleAddressLength, out var bundleMethodPair))
-                {
-                    HandleCallbacks(bundleMethodPair, parser.MessageValues);
-                }
-                // if we have no handler for this exact address, we may have a pattern that matches it
                 else if (AddressSpace._patternCount > 0)
                 {
-                    TryMatchPatterns(parser, bufferPtr, bundleAddressLength);
+                    TryMatchPatterns(parser, bufferPtr, addressLength);
                 }
 
-                MessageOffset += messageSize + 4;
-
                 if (_monitorCallbacks.Count > 0)
-                    HandleMonitorCallbacks(contentPtr, bundleAddressLength, parser);
+                    HandleMonitorCallbacks(bufferPtr, addressLength, parser);
+
+                return;
             }
+
+            // the message is a bundle, so we need to recursively scan the bundle elements
+            int MessageOffset = 0;
+            bool recurse;
+            // the outer do-while loop runs once for every #bundle encountered
+            do
+            {
+                // Timestamp isn't used yet, but it will be eventually
+                // var time = parser.MessageValues.ReadTimestampIndex(MessageOffset + 8);
+                // '#bundle ' + timestamp = 16 bytes
+                MessageOffset += 16;
+                recurse = false;
+
+                // the inner while loop runs once per bundle element
+                while (MessageOffset < byteLength && !recurse)
+                {
+                    var messageSize = (int)parser.MessageValues.ReadUIntIndex(MessageOffset);
+                    var contentIndex = MessageOffset + 4;
+
+                    if (parser.IsBundleTagAtIndex(contentIndex))
+                    {
+                        // this bundle element's contents are a bundle, break out to the outer loop to scan it
+                        MessageOffset = contentIndex;
+                        recurse = true;
+                        continue;
+                    }
+
+                    // parse the actual contents of this bundle element just like a non-bundled message
+                    var bundleAddressLength = parser.Parse(contentIndex);
+                    if (bundleAddressLength <= 0)
+                    {
+                        // if an error occured parsing the content, skip this messagse entirely
+                        MessageOffset += messageSize + 4;
+                        continue;
+                    }
+
+                    var contentPtr = bufferPtr + contentIndex;
+                    if (addressToMethod.TryGetValueFromBytes(contentPtr, bundleAddressLength, out var bundleMethodPair))
+                    {
+                        HandleCallbacks(bundleMethodPair, parser.MessageValues);
+                    }
+                    // if we have no handler for this exact address, we may have a pattern that matches it
+                    else if (AddressSpace._patternCount > 0)
+                    {
+                        TryMatchPatterns(parser, bufferPtr, bundleAddressLength);
+                    }
+
+                    MessageOffset += messageSize + 4;
+
+                    if (_monitorCallbacks.Count > 0)
+                        HandleMonitorCallbacks(contentPtr, bundleAddressLength, parser);
+                }
+            }
+            // restart the outer while loop every time a bundle within a bundle is detected
+            while (recurse);
         }
-        // restart the outer while loop every time a bundle within a bundle is detected
-        while (recurse);
     }
 
     private void HandleCallbacks(OscActionPair pair, OscMessageValues messageValues)
@@ -362,7 +359,6 @@ public sealed unsafe class OscServer : IDisposable
         if (_disposed) return;
         _disposed = true;
 
-        if (_bufferHandle.IsAllocated) _bufferHandle.Free();
         AddressSpace._addressToMethod.Dispose();
         _socket.Dispose();
     }
