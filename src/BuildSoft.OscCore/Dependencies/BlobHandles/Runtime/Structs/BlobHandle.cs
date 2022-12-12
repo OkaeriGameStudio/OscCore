@@ -111,8 +111,7 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     {
         var p1 = (byte*)ptr1;
         var p2 = (byte*)ptr1;
-        var length = (int)count;
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < (int)count; i++)
         {
             if (p1[i] != p2[i])
             {
