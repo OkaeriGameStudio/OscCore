@@ -8,7 +8,7 @@ namespace BlobHandles;
 /// <summary>
 /// Represents a string as a fixed blob of bytes
 /// </summary>
-public struct BlobString : IDisposable, IEquatable<BlobString>
+public readonly struct BlobString : IDisposable, IEquatable<BlobString>
 {
     /// <summary>
     /// The encoding used to convert to and from strings.

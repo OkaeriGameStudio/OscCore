@@ -8,7 +8,7 @@ namespace BlobHandles;
 /// Wraps an arbitrary chunk of bytes in memory, so it can be used as a hash key
 /// and compared against other instances of the same set of bytes 
 /// </summary>
-public unsafe struct BlobHandle : IEquatable<BlobHandle>
+public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
 {
     /// <summary>A pointer to the start of the blob</summary>
     public readonly byte* Pointer;
@@ -111,7 +111,8 @@ public unsafe struct BlobHandle : IEquatable<BlobHandle>
     {
         var p1 = (byte*)ptr1;
         var p2 = (byte*)ptr1;
-        for (int i = 0; i < (int)count; i++)
+        var length = (int)count;
+        for (int i = 0; i < length; i++)
         {
             if (p1[i] != p2[i])
             {
