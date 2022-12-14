@@ -4,11 +4,11 @@
     <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	<LangVersion>10.0</LangVersion>
-	<RootNamespace>BuildSoft.OscCore</RootNamespace>
-	<BaseOutputPath>..\..\bin</BaseOutputPath>
-	<GenerateDocumentationFile>True</GenerateDocumentationFile>
-	<DocumentationFile>..\..\docs\xml\$(AssemblyName).xml</DocumentationFile>
+    <LangVersion>10.0</LangVersion>
+    <RootNamespace>BuildSoft.OscCore</RootNamespace>
+    <BaseOutputPath>..\..\bin</BaseOutputPath>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>..\..\docs\xml\$(AssemblyName).xml</DocumentationFile>
 
     <PackageId>BuildSoft.OscCore</PackageId>
     <Version>1.1.2</Version>
