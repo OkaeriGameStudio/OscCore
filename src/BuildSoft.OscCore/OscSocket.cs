@@ -38,9 +38,6 @@ internal sealed class OscSocket : IDisposable
 
     private void Serve()
     {
-#if UNITY_EDITOR
-            Profiler.BeginThreadProfiling("OscCore", "Server");
-#endif
         var buffer = Server.Parser._buffer;
         var socket = _socket;
 
