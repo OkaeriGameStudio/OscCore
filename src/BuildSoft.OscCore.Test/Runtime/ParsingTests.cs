@@ -11,14 +11,12 @@ public class ParsingTests
 {
     private const int BufferSize = 4096;
     private readonly byte[] _buffer = new byte[BufferSize];
-    private GCHandle _bufferHandle;
     private OscParser _parser = null!;
 
     [OneTimeSetUp]
     public void BeforeAll()
     {
-        _bufferHandle = GCHandle.Alloc(_buffer, GCHandleType.Pinned);
-        _parser = new OscParser(_buffer);
+        _parser = new OscParser();
     }
 
     [SetUp]
@@ -30,7 +28,7 @@ public class ParsingTests
     [OneTimeTearDown]
     public void AfterAll()
     {
-        if (_bufferHandle.IsAllocated) _bufferHandle.Free();
+
     }
 
     [TestCaseSource(typeof(TagsTestData), nameof(TagsTestData.StandardTagParseCases))]

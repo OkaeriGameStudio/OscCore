@@ -14,7 +14,6 @@ public sealed unsafe class OscServer : IDisposable
     private readonly OscSocket _socket;
     private bool _disposed;
     private bool _started;
-    private readonly byte[] _readBuffer;
     private readonly Queue<Action> _mainThreadQueue = new();
     private readonly Dictionary<int, string> _byteLengthToStringBuffer = new();
     private readonly List<MonitorCallback> _monitorCallbacks = new();
@@ -40,11 +39,8 @@ public sealed unsafe class OscServer : IDisposable
 
         _singleCallbackToPair.Clear();
         AddressSpace = new OscAddressSpace();
-
-        _readBuffer = new byte[bufferSize];
-        Parser = new OscParser(_readBuffer);
-
         Port = port;
+        Parser = new OscParser(bufferSize);
         _socket = new OscSocket(port, this);
         Start();
     }

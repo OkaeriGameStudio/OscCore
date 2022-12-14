@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace BuildSoft.OscCore;
 
@@ -16,10 +17,23 @@ public unsafe class OscParser
     public readonly OscMessageValues MessageValues;
 
     /// <summary>Create a new parser.</summary>
-    /// <param name="fixedBuffer">The buffer to read messages from.  Must be fixed in memory !</param>
+    /// <param name="fixedBuffer">The buffer to read messages from.</param>
+    [Obsolete("Use OscParser(int bufferLength)")]
     public OscParser(byte[] fixedBuffer)
     {
         _buffer = fixedBuffer;
+        MessageValues = new OscMessageValues(_buffer, MaxElementsPerMessage);
+    }
+
+    /// <summary>Create a new parser.</summary>
+    /// <param name="capacity">The capacity of buffer to read messages from.</param>
+    public OscParser(int capacity = 4096)
+    {
+        if (capacity < 256)
+        {
+            capacity = 4096;
+        }
+        _buffer = new byte[capacity];
         MessageValues = new OscMessageValues(_buffer, MaxElementsPerMessage);
     }
 
