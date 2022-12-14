@@ -26,6 +26,19 @@ public class OscActionPair
         MainThreadQueued = mainThreadQueued;
     }
 
+
+    /// <summary>
+    /// Deconstruct pair.
+    /// </summary>
+    /// <param name="valueRead">returns <see cref="ValueRead"/></param>
+    /// <param name="mainThreadQueued">returns <see cref="MainThreadQueued"/></param>
+    public void Deconstruct(out Action<OscMessageValues> valueRead, out Action? mainThreadQueued)
+    {
+        valueRead = ValueRead;
+        mainThreadQueued = MainThreadQueued;
+    }
+
+
     public static OscActionPair operator +(OscActionPair l, OscActionPair r)
     {
         var mainThread = l.MainThreadQueued == null ? r.MainThreadQueued : l.MainThreadQueued + r.MainThreadQueued;

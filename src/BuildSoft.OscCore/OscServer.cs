@@ -15,8 +15,7 @@ public sealed unsafe class OscServer : IDisposable
     private bool _disposed;
     private bool _started;
     private readonly byte[] _readBuffer;
-    private Action?[] _mainThreadQueue = new Action[16];
-    private int _mainThreadCount;
+    private readonly Queue<Action> _mainThreadQueue = new();
     private readonly Dictionary<int, string> _byteLengthToStringBuffer = new();
     private readonly List<MonitorCallback> _monitorCallbacks = new();
     private readonly List<OscActionPair> _patternMatchedMethods = new();
@@ -188,12 +187,11 @@ public sealed unsafe class OscServer : IDisposable
     /// <summary>Must be called on the main thread every frame to handle queued events</summary>
     public void Update()
     {
-        for (int i = 0; i < _mainThreadCount; i++)
+        var queue = _mainThreadQueue;
+        while (queue.Count > 0)
         {
-            _mainThreadQueue[i]?.Invoke();
+            queue.Dequeue().Invoke();
         }
-
-        _mainThreadCount = 0;
     }
 
     /// <summary>
@@ -299,10 +297,7 @@ public sealed unsafe class OscServer : IDisposable
         // if there's a main thread method, queue it
         if (pair.MainThreadQueued != null)
         {
-            if (_mainThreadCount >= _mainThreadQueue.Length)
-                Array.Resize(ref _mainThreadQueue, _mainThreadCount + 16);
-
-            _mainThreadQueue[_mainThreadCount++] = pair.MainThreadQueued;
+            _mainThreadQueue.Enqueue(pair.MainThreadQueued);
         }
     }
 
@@ -334,10 +329,13 @@ public sealed unsafe class OscServer : IDisposable
         {
             var bufferCopy = string.Copy(stringBuffer);
             AddressSpace._addressToMethod.Add(bufferCopy, _patternMatchedMethods);
-            foreach (var matchedMethod in _patternMatchedMethods)
+            foreach (var (valueRead, mainThreadQueued) in _patternMatchedMethods)
             {
-                matchedMethod.ValueRead(parser.MessageValues);
-                _mainThreadQueue[_mainThreadCount++] = matchedMethod.MainThreadQueued;
+                valueRead(parser.MessageValues);
+                if (mainThreadQueued != null)
+                {
+                    _mainThreadQueue.Enqueue(mainThreadQueued);
+                }
             }
         }
     }
