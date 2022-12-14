@@ -28,7 +28,7 @@ public sealed unsafe class OscServer : IDisposable
     public static readonly Dictionary<int, OscServer> PortToServer = new();
 
     public int Port { get; }
-    public OscAddressSpace AddressSpace { get; private set; }
+    public OscAddressSpace AddressSpace { get; }
     public OscParser Parser { get; }
 
     public OscServer(int port, int bufferSize = 4096)
@@ -368,6 +368,6 @@ public sealed unsafe class OscServer : IDisposable
 
     public int CountHandlers()
     {
-        return AddressSpace?._addressToMethod._sourceToBlob.Count ?? 0;
+        return AddressSpace._addressToMethod._sourceToBlob.Count;
     }
 }
