@@ -26,7 +26,7 @@ public sealed unsafe class OscServer : IDisposable
     /// </summary>
     public static readonly Dictionary<int, OscServer> PortToServer = new();
 
-    public int Port { get; }
+    public int Port => _socket.Port;
     public OscAddressSpace AddressSpace { get; }
     public OscParser Parser { get; }
 
@@ -39,7 +39,6 @@ public sealed unsafe class OscServer : IDisposable
 
         _singleCallbackToPair.Clear();
         AddressSpace = new OscAddressSpace();
-        Port = port;
         Parser = new OscParser(bufferSize);
         _socket = new OscSocket(port, this);
         Start();

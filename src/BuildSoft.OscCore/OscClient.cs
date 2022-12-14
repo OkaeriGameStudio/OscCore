@@ -8,11 +8,10 @@ namespace BuildSoft.OscCore;
 
 public class OscClient : IDisposable
 {
-    private readonly Socket _socket;
     /// <summary>
     /// The socket for sending messages
     /// </summary>
-    public Socket Socket => _socket;
+    public Socket Socket { get; }
 
     /// <summary>Serializes outgoing messages</summary>
     public OscWriter Writer { get; }
@@ -24,12 +23,12 @@ public class OscClient : IDisposable
     {
         Writer = new OscWriter();
 
-        _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         if (ipAddress == "255.255.255.255")
-            _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+            Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
 
         Destination = new IPEndPoint(IPAddress.Parse(ipAddress), port);
-        _socket.Connect(Destination);
+        Socket.Connect(Destination);
     }
 
     ~OscClient()
@@ -43,7 +42,7 @@ public class OscClient : IDisposable
         Writer.Reset();
         Writer.Write(address);
         Writer.Write(",");
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint Int32TypeTagBytes = 26924;    // ",i  " 
@@ -53,7 +52,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, Int32TypeTagBytes);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint Float32TypeTagBytes = 26156;    // ",f  " 
@@ -63,7 +62,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, Float32TypeTagBytes);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint StringTypeTagBytes = 29484;    // ",s  " 
@@ -73,7 +72,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, StringTypeTagBytes);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint BlobTypeTagBytes = 25132;    // ",b  " 
@@ -87,7 +86,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, BlobTypeTagBytes);
         Writer.Write(bytes, length, start);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     /// <summary>Send a message with 2 32-bit float elements</summary>
@@ -98,7 +97,7 @@ public class OscClient : IDisposable
         const string typeTags = ",ff";
         Writer.Write(typeTags);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     /// <summary>Send a message with 3 32-bit float elements</summary>
@@ -109,7 +108,7 @@ public class OscClient : IDisposable
         const string typeTags = ",fff";
         Writer.Write(typeTags);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint Int64TypeTagBytes = 25644;    // ",d  " 
@@ -119,7 +118,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, Int64TypeTagBytes);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint Float64TypeTagBytes = 26668;    // ",h  " 
@@ -129,7 +128,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, Float64TypeTagBytes);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint Color32TypeTagBytes = 29228;    // ",r  " 
@@ -139,7 +138,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, Color32TypeTagBytes);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint MidiTypeTagBytes = 27948;    // ",m  " 
@@ -149,7 +148,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, MidiTypeTagBytes);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint CharTypeTagBytes = 25388;    // ",c  " 
@@ -159,7 +158,7 @@ public class OscClient : IDisposable
     {
         Writer.WriteAddressAndTags(address, CharTypeTagBytes);
         Writer.Write(element);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint TrueTypeTagBytes = 21548;    // ",T  " 
@@ -169,7 +168,7 @@ public class OscClient : IDisposable
     public void Send(string address, bool element)
     {
         Writer.WriteAddressAndTags(address, element ? TrueTypeTagBytes : FalseTypeTagBytes);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint NilTypeTagBytes = 20012;    // ",N  " 
@@ -178,7 +177,7 @@ public class OscClient : IDisposable
     public void SendNil(string address)
     {
         Writer.WriteAddressAndTags(address, NilTypeTagBytes);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private const uint InfinitumTypeTagBytes = 18732;    // ",I  " 
@@ -187,7 +186,7 @@ public class OscClient : IDisposable
     public void SendInfinitum(string address)
     {
         Writer.WriteAddressAndTags(address, InfinitumTypeTagBytes);
-        _socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
+        Socket.Send(Writer.Buffer, Writer.Length, SocketFlags.None);
     }
 
     private static unsafe uint[] GetAlignedAsciiBytes(string input)
@@ -210,7 +209,7 @@ public class OscClient : IDisposable
     {
         if (!_isDisporsed)
         {
-            _socket.Dispose();
+            Socket.Dispose();
             Writer.Dispose();
             _isDisporsed = true;
         }
