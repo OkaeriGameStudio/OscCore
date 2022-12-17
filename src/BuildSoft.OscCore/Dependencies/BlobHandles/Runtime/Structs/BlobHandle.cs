@@ -11,19 +11,37 @@ namespace BlobHandles;
 public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
 {
     /// <summary>A pointer to the start of the blob</summary>
-    public readonly byte* Pointer;
+    public byte* Pointer
+    {
+        get
+        {
+            if (_pointer != null)
+            {
+                return _pointer;
+            }
+            fixed (byte* pointer = &_bytes[_offset])
+            {
+                return pointer;
+            }
+        }
+    }
+
+    private readonly byte* _pointer;
+    private readonly byte[] _bytes;
+    private readonly int _offset;
+
     /// <summary>The number of bytes in the blob</summary>
     public readonly int Length;
 
     public BlobHandle(byte* pointer, int length)
     {
-        Pointer = pointer;
+        _pointer = pointer;
         Length = length;
     }
 
     public BlobHandle(IntPtr pointer, int length)
     {
-        Pointer = (byte*)pointer;
+        _pointer = (byte*)pointer;
         Length = length;
     }
 
@@ -33,11 +51,8 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     /// <param name="bytes">The bytes to get a handle to</param>
     public BlobHandle(byte[] bytes)
     {
-        fixed (byte* ptr = bytes)
-        {
-            Pointer = ptr;
-            Length = bytes.Length;
-        }
+        _bytes = bytes;
+        Length = bytes.Length;
     }
 
     /// <summary>
@@ -47,11 +62,8 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     /// <param name="length">The number of bytes to include. Not bounds checked</param>
     public BlobHandle(byte[] bytes, int length)
     {
-        fixed (byte* ptr = bytes)
-        {
-            Pointer = ptr;
-            Length = length;
-        }
+        _bytes = bytes;
+        Length = length;
     }
 
     /// <summary>
@@ -62,11 +74,9 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     /// <param name="offset">The byte array index to start the blob at</param>
     public BlobHandle(byte[] bytes, int length, int offset)
     {
-        fixed (byte* ptr = &bytes[offset])
-        {
-            Pointer = ptr;
-            Length = length;
-        }
+        _bytes = bytes;
+        Length = length;
+        _offset = offset;
     }
 
     public override string ToString()
@@ -121,4 +131,3 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
         return 0;
     }
 }
-
