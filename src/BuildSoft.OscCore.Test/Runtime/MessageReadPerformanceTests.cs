@@ -1,62 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using BuildSoft.OscCore.UnityObjects;
-using MiniNtp;
 using NUnit.Framework;
 
 namespace BuildSoft.OscCore.Tests;
+
+[StructLayout(LayoutKind.Explicit)]
+public unsafe struct ConvertBuffer
+{
+    [FieldOffset(0)]
+    public fixed byte Bytes[8];
+    [FieldOffset(0)]
+    public readonly int @int;
+    [FieldOffset(0)]
+    public readonly long @long;
+    [FieldOffset(0)]
+    public readonly float @float;
+    [FieldOffset(0)]
+    public readonly double @double;
+
+    public byte[] GetReversedBytes(int size)
+    {
+        Debug.Assert(size > 0 && size <= 8);
+        fixed (byte* p = Bytes)
+        {
+            return TestUtil.ReversedCopy(p, size);
+        }
+    }
+}
 
 public class MessageReadPerformanceTests
 {
     private const int Count = 4096;
     private static readonly Stopwatch _stopwatch = new();
-    private readonly int[] _intSourceData = new int[Count];
-    private readonly float[] _floatSourceData = new float[Count];
-    private readonly byte[] _bigEndianIntSourceBytes = new byte[Count * 4];
-    private readonly byte[] _bigEndianFloatSourceBytes = new byte[Count * 4];
+    private readonly ConvertBuffer[] _buffers = new ConvertBuffer[Count];
     private readonly byte[] _midiSourceBytes = TestUtil.RandomMidiBytes(Count * 4);
     private readonly byte[] _timeSourceBytes = TestUtil.RandomTimestampBytes(Count * 4);
-    private readonly List<GCHandle> _handles = new();
 
     [OneTimeSetUp]
-    public void BeforeAll()
+    public unsafe void BeforeAll()
     {
-        _handles.Clear();
-
-        _handles.Add(GCHandle.Alloc(_bigEndianIntSourceBytes, GCHandleType.Pinned));
-        _handles.Add(GCHandle.Alloc(_bigEndianFloatSourceBytes, GCHandleType.Pinned));
-
-        for (int i = 0; i < _intSourceData.Length; i++)
-            _intSourceData[i] = TestUtil.SharedRandom.Next(-10000, 10000);
-
-        for (int i = 0; i < _floatSourceData.Length; i++)
-            _floatSourceData[i] = (float)TestUtil.SharedRandom.NextDouble() * 200f - 100f;
+        for (int i = 0; i < _buffers.Length; i++)
+        {
+            fixed (byte* bytes = _buffers[i].Bytes)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    bytes[j] = unchecked((byte)TestUtil.SharedRandom.Next());
+                }
+            }
+        }
     }
 
     [SetUp]
     public void BeforeEach()
     {
-        for (int i = 0; i < _intSourceData.Length; i++)
-        {
-            var lBytes = BitConverter.GetBytes(_intSourceData[i]);
-            var bBytes = TestUtil.ReversedCopy(lBytes);
 
-            var elementStart = i * 4;
-            for (int j = 0; j < bBytes.Length; j++)
-                _bigEndianIntSourceBytes[elementStart + j] = bBytes[j];
-        }
-
-        for (int i = 0; i < _floatSourceData.Length; i++)
-        {
-            var lBytes = BitConverter.GetBytes(_floatSourceData[i]);
-            var bBytes = TestUtil.ReversedCopy(lBytes);
-
-            var elementStart = i * 4;
-            for (int j = 0; j < bBytes.Length; j++)
-                _bigEndianFloatSourceBytes[elementStart + j] = bBytes[j];
-        }
     }
 
     private static OscMessageValues FromBytes(byte[] bytes, int count, TypeTag tag, int byteSize = 4)
@@ -72,11 +74,24 @@ public class MessageReadPerformanceTests
         return values;
     }
 
+    private static OscMessageValues FromBytes(ConvertBuffer[] buffers, int count, TypeTag tag, int byteSize)
+    {
+        var values = new OscMessageValues(buffers.SelectMany(s => s.GetReversedBytes(byteSize)).ToArray(), count);
+        for (int i = 0; i < count; i++)
+        {
+            values._offsets[i] = i * byteSize;
+            values._tags[i] = tag;
+        }
+
+        values.ElementCount = count;
+        return values;
+    }
+
     [Test]
     public void ReadFloatElement_CheckedVsUnchecked()
     {
         const int count = 2048;
-        var values = FromBytes(_bigEndianFloatSourceBytes, count, TypeTag.Float32);
+        var values = FromBytes(_buffers, count, TypeTag.Float32, sizeof(float));
 
         float value = 0f;
         _stopwatch.Restart();
@@ -99,10 +114,93 @@ public class MessageReadPerformanceTests
     }
 
     [Test]
+    public void ReadFloatElement_Checked()
+    {
+        const int count = 2048;
+        var values = FromBytes(_buffers, count, TypeTag.Float32, sizeof(float));
+
+        for (int i = 0; i < count; i++)
+        {
+            Assert.AreEqual(_buffers[i].@float, values.ReadFloatElement(i));
+            Assert.AreEqual((double)_buffers[i].@float, values.ReadFloat64Element(i));
+            Assert.AreEqual((int)_buffers[i].@float, values.ReadIntElement(i));
+            Assert.AreEqual((long)_buffers[i].@float, values.ReadInt64Element(i));
+            Assert.AreEqual(_buffers[i].@float.ToString(), values.ReadStringElement(i));
+        }
+    }
+
+    [Test]
+    public void ReadFloatElement_Unchecked()
+    {
+        const int count = 2048;
+        var values = FromBytes(_buffers, count, TypeTag.Float32, sizeof(float));
+
+        for (int i = 0; i < count; i++)
+        {
+            Assert.AreEqual(_buffers[i].@float, values.ReadFloatElementUnchecked(i));
+        }
+    }
+
+    [Test]
+    public void ReadFloat64Element_Checked()
+    {
+        const int count = 2048;
+        var values = FromBytes(_buffers, count, TypeTag.Float64, sizeof(double));
+
+        for (int i = 0; i < count; i++)
+        {
+            Assert.AreEqual(_buffers[i].@double, values.ReadFloat64Element(i));
+            Assert.AreEqual((long)_buffers[i].@double, values.ReadInt64Element(i));
+            Assert.AreEqual(_buffers[i].@double.ToString(), values.ReadStringElement(i));
+        }
+    }
+
+    [Test]
+    public void ReadFloat64Element_Unchecked()
+    {
+        const int count = 2048;
+        var values = FromBytes(_buffers, count, TypeTag.Float64, sizeof(double));
+
+        for (int i = 0; i < count; i++)
+        {
+            Assert.AreEqual(_buffers[i].@double, values.ReadFloat64ElementUnchecked(i));
+        }
+    }
+
+
+    [Test]
+    public void ReadInt64Element_Checked()
+    {
+        const int count = 2048;
+        var values = FromBytes(_buffers, count, TypeTag.Int64, sizeof(double));
+
+        for (int i = 0; i < count; i++)
+        {
+            Assert.AreEqual(_buffers[i].@long, values.ReadInt64Element(i));
+            Assert.AreEqual((double)_buffers[i].@long, values.ReadFloat64Element(i));
+            Assert.AreEqual(_buffers[i].@long.ToString(), values.ReadStringElement(i));
+        }
+    }
+
+    [Test]
+    public void ReadInt64Element_Unchecked()
+    {
+        const int count = 2048;
+        var values = FromBytes(_buffers, count, TypeTag.Int64, sizeof(double));
+
+        for (int i = 0; i < count; i++)
+        {
+            Assert.AreEqual(_buffers[i].@long, values.ReadInt64ElementUnchecked(i));
+        }
+    }
+
+
+
+    [Test]
     public void ReadIntElement_CheckedVsUnchecked()
     {
         const int count = 2048;
-        var values = FromBytes(_bigEndianIntSourceBytes, count, TypeTag.Int32);
+        var values = FromBytes(_buffers, count, TypeTag.Int32, sizeof(int));
 
         float value = 0f;
         _stopwatch.Restart();

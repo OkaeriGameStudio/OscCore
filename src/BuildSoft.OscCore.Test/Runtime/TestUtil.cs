@@ -50,6 +50,16 @@ public static class TestUtil
         Array.Reverse(copy);
         return copy;
     }
+    public static unsafe byte[] ReversedCopy(byte* source, int length)
+    {
+        var copy = new byte[length];
+        fixed (byte* copyPtr = copy)
+        {
+            Buffer.MemoryCopy(source, copyPtr, length, length);
+        }
+        Array.Reverse(copy);
+        return copy;
+    }
 
     public static byte[] RandomFloatBytes(int byteCount = 2048)
     {
