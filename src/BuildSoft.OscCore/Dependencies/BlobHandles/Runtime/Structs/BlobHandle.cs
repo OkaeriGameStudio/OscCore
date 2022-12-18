@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -11,18 +13,15 @@ namespace BlobHandles;
 public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
 {
     /// <summary>A pointer to the start of the blob</summary>
-    public byte* Pointer
+    public ref byte Pointer
     {
         get
         {
             if (_pointer != null)
             {
-                return _pointer;
+                return ref *_pointer;
             }
-            fixed (byte* pointer = &_bytes[_offset])
-            {
-                return pointer;
-            }
+            return ref _bytes[_offset];
         }
     }
 
@@ -31,7 +30,16 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     private readonly int _offset;
 
     /// <summary>The number of bytes in the blob</summary>
-    public readonly int Length;
+    public int Length { get; }
+
+    private ref byte this[int index]
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get
+        {
+            return ref Unsafe.Add(ref Pointer, (nint)(uint)index /* force zero-extension */);
+        }
+    }
 
     public BlobHandle(byte* pointer, int length)
     {
@@ -89,7 +97,7 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     {
         unchecked
         {
-            return Length * 397 ^ Pointer[Length - 1];
+            return Length * 397 ^ this[Length - 1];
         }
     }
 
@@ -97,7 +105,7 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     public bool Equals(BlobHandle other)
     {
         return Length == other.Length &&
-               MemoryCompare(Pointer, other.Pointer, (UIntPtr)Length) == 0;
+               MemoryCompare(ref Pointer, ref other.Pointer, Length) == 0;
     }
 
     public override bool Equals(object obj)
@@ -108,20 +116,20 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     public static bool operator ==(BlobHandle left, BlobHandle right)
     {
         return left.Length == right.Length &&
-               MemoryCompare(left.Pointer, right.Pointer, (UIntPtr)left.Length) == 0;
+               MemoryCompare(ref left.Pointer, ref right.Pointer, left.Length) == 0;
     }
 
     public static bool operator !=(BlobHandle left, BlobHandle right)
     {
         return left.Length != right.Length ||
-               MemoryCompare(left.Pointer, right.Pointer, (UIntPtr)left.Length) != 0;
+               MemoryCompare(ref left.Pointer, ref right.Pointer, left.Length) != 0;
     }
 
-    private static int MemoryCompare(void* ptr1, void* ptr2, UIntPtr count)
+    private static int MemoryCompare(ref byte ptr1, ref byte ptr2, int count)
     {
         var p1 = (byte*)ptr1;
-        var p2 = (byte*)ptr1;
-        for (int i = 0; i < (int)count; i++)
+        var p2 = (byte*)ptr2;
+        for (int i = 0; i < (uint)count; i++)
         {
             if (p1[i] != p2[i])
             {
