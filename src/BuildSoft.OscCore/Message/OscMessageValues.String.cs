@@ -47,7 +47,7 @@ public sealed unsafe partial class OscMessageValues
                 return buffer.@float.ToString(CultureInfo.CurrentCulture);
 
             case TypeTag.Int64:
-                var i64 = IPAddress.NetworkToHostOrder(_sharedBuffer[offset]);
+                var i64 = IPAddress.NetworkToHostOrder(Unsafe.As<byte, long>(ref _sharedBuffer[offset]));
                 return i64.ToString(CultureInfo.CurrentCulture);
 
             case TypeTag.Int32:
@@ -77,12 +77,7 @@ public sealed unsafe partial class OscMessageValues
                 return buffer.Color32.ToString();
 
             case TypeTag.MIDI:
-                MidiMessage midi;
-                fixed (byte* p = &_sharedBuffer[offset])
-                {
-                    midi = *(MidiMessage*)p;
-                }
-                return midi.ToString();
+                return Unsafe.As<byte, MidiMessage>(ref _sharedBuffer[offset]).ToString();
             case TypeTag.AsciiChar32:
                 // ascii chars are encoded in the last byte of the 4-byte block
                 return ((char)_sharedBuffer[offset + 3]).ToString();

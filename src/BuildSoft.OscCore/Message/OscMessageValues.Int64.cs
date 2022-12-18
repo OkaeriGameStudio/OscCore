@@ -66,6 +66,7 @@ public sealed unsafe partial class OscMessageValues
         if (OutOfBounds(index)) return default;
 #endif
         long bigEndian;
+        Unsafe.AsRef<long>((void*)_sharedBuffer[_offsets[index]]);
         fixed (byte* p = &_sharedBuffer[_offsets[index]])
             bigEndian = *(long*)p;
         return IPAddress.NetworkToHostOrder(bigEndian);
