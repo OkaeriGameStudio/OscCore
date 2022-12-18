@@ -37,10 +37,8 @@ public sealed unsafe partial class OscMessageValues
                 buffer.Bits32[3] = _sharedBuffer[offset];
                 return buffer.@float;
             case TypeTag.Int64:
-                fixed (byte* bufPtr = &_sharedBuffer[offset])
-                {
-                    return IPAddress.NetworkToHostOrder(*(long*)bufPtr);
-                }
+                long bigEndian = Unsafe.As<byte, long>(ref _sharedBuffer[_offsets[index]]);
+                return IPAddress.NetworkToHostOrder(bigEndian);
             case TypeTag.Int32:
                 return _sharedBuffer[index] << 24 |
                        _sharedBuffer[index + 1] << 16 |
