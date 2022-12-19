@@ -40,10 +40,10 @@ public sealed unsafe partial class OscMessageValues
                 long bigEndian = Unsafe.As<byte, long>(ref _sharedBuffer[_offsets[index]]);
                 return IPAddress.NetworkToHostOrder(bigEndian);
             case TypeTag.Int32:
-                return _sharedBuffer[index] << 24 |
-                       _sharedBuffer[index + 1] << 16 |
-                       _sharedBuffer[index + 2] << 8 |
-                       _sharedBuffer[index + 3];
+                return _sharedBuffer[offset] << 24 |
+                       _sharedBuffer[offset + 1] << 16 |
+                       _sharedBuffer[offset + 2] << 8 |
+                       _sharedBuffer[offset + 3];
         }
 
         throw new InvalidOperationException();
