@@ -63,7 +63,6 @@ internal sealed class OscSocket : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        _socket.Close();
         _socket.Dispose();
         _disposed = true;
     }
