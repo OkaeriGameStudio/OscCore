@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -62,5 +63,24 @@ public struct Color32
     {
         rgba = 0;
         (this.r, this.g, this.b, this.a) = (r, g, b, a);
+    }
+
+    /// <summary>
+    /// Returns a nicely formatted string of this color.
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+        return string.Format(CultureInfo.InvariantCulture.NumberFormat, "RGBA({0}, {1}, {2}, {3})", r, g, b, a);
+    }
+
+    /// <summary>
+    /// Returns a nicely formatted string of this color.
+    /// </summary>
+    /// <param name="format"></param>
+    /// <returns></returns>
+    public string ToString(string format)
+    {
+        return string.Format(CultureInfo.InvariantCulture.NumberFormat, "RGBA({0}, {1}, {2}, {3})", r.ToString(format), g.ToString(format), b.ToString(format), a.ToString(format));
     }
 }
