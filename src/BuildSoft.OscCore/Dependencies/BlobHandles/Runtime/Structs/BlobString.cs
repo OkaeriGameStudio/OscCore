@@ -33,7 +33,7 @@ public readonly struct BlobString : IDisposable, IEquatable<BlobString>
 
     public override unsafe string ToString()
     {
-        return Encoding.GetString((byte*)Handle.Pointer, Handle.Length);
+        return Encoding.GetString((byte*)Handle.Reference, Handle.Length);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

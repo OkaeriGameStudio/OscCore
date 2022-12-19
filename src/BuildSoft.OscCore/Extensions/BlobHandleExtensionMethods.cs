@@ -11,7 +11,7 @@ namespace BlobHandles;
 /// </summary>
 public static class BlobHandleExtensionMethods
 {
-    public static unsafe ReadOnlySpan<byte> AsSpan(this BlobHandle blobHandle) => new(Unsafe.AsPointer(ref blobHandle.Pointer), blobHandle.Length);
+    public static unsafe ReadOnlySpan<byte> AsSpan(this BlobHandle blobHandle) => new(Unsafe.AsPointer(ref blobHandle.Reference), blobHandle.Length);
     public static unsafe ReadOnlySpan<byte> AsSpan(this BlobString blobString) => blobString.Handle.AsSpan();
 }
 #endif

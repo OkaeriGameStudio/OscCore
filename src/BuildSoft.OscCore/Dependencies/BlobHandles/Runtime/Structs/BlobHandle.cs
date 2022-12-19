@@ -13,7 +13,10 @@ namespace BlobHandles;
 public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
 {
     /// <summary>A pointer to the start of the blob</summary>
-    public ref byte Pointer
+    public byte* Pointer => (byte*)Reference;
+
+    /// <summary>A reference to the start of the blob</summary>
+    public ref byte Reference
     {
         get
         {
@@ -37,7 +40,7 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
-            return ref Unsafe.Add(ref Pointer, (nint)(uint)index /* force zero-extension */);
+            return ref Unsafe.Add(ref Reference, (nint)(uint)index /* force zero-extension */);
         }
     }
 
@@ -89,7 +92,7 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
 
     public override string ToString()
     {
-        return $"{Length} bytes @ {new IntPtr(Pointer)}";
+        return $"{Length} bytes @ {new IntPtr(Reference)}";
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -105,7 +108,7 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     public bool Equals(BlobHandle other)
     {
         return Length == other.Length &&
-               MemoryCompare(ref Pointer, ref other.Pointer, Length) == 0;
+               MemoryCompare(ref Reference, ref other.Reference, Length) == 0;
     }
 
     public override bool Equals(object obj)
@@ -116,13 +119,13 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
     public static bool operator ==(BlobHandle left, BlobHandle right)
     {
         return left.Length == right.Length &&
-               MemoryCompare(ref left.Pointer, ref right.Pointer, left.Length) == 0;
+               MemoryCompare(ref left.Reference, ref right.Reference, left.Length) == 0;
     }
 
     public static bool operator !=(BlobHandle left, BlobHandle right)
     {
         return left.Length != right.Length ||
-               MemoryCompare(ref left.Pointer, ref right.Pointer, left.Length) != 0;
+               MemoryCompare(ref left.Reference, ref right.Reference, left.Length) != 0;
     }
 
     private static int MemoryCompare(ref byte ptr1, ref byte ptr2, int count)

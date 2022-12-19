@@ -130,7 +130,7 @@ public sealed unsafe class OscWriter : IDisposable
     public void Write(BlobString data)
     {
         var strLength = data.Length;
-        Unsafe.CopyBlock(ref Unsafe.AsRef(Buffer[_length]), ref data.Handle.Pointer, (uint)strLength);
+        Unsafe.CopyBlock(ref Unsafe.AsRef(Buffer[_length]), ref data.Handle.Reference, (uint)strLength);
         _length += strLength;
 
         var alignedLength = (data.Length + 3) & ~3;
