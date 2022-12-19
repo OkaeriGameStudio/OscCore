@@ -19,7 +19,7 @@ internal sealed class OscSocket : IDisposable
     {
         Port = port;
         _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp) { ReceiveTimeout = int.MaxValue };
-        _task = new Task(Serve);
+        _task = new Task(Serve, TaskCreationOptions.LongRunning);
         Server = server;
     }
 
