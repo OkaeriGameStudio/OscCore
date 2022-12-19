@@ -8,30 +8,7 @@ using NUnit.Framework;
 
 namespace BuildSoft.OscCore.Tests;
 
-[StructLayout(LayoutKind.Explicit)]
-public unsafe struct ConvertBuffer
-{
-    [FieldOffset(0)]
-    public fixed byte Bytes[8];
-    [FieldOffset(0)]
-    public readonly int @int;
-    [FieldOffset(0)]
-    public readonly long @long;
-    [FieldOffset(0)]
-    public readonly float @float;
-    [FieldOffset(0)]
-    public readonly double @double;
-
-    public byte[] GetReversedBytes(int size)
-    {
-        Debug.Assert(size > 0 && size <= 8);
-        fixed (byte* p = Bytes)
-        {
-            return TestUtil.ReversedCopy(p, size);
-        }
-    }
-}
-
+[TestOf(typeof(OscMessageValues))]
 public class MessageReadPerformanceTests
 {
     private const int Count = 4096;
@@ -47,7 +24,7 @@ public class MessageReadPerformanceTests
         {
             fixed (byte* bytes = _buffers[i].Bytes)
             {
-                for (int j = 0; j < 8; j++)
+                for (int j = 0; j < sizeof(ConvertBuffer); j++)
                 {
                     bytes[j] = unchecked((byte)TestUtil.SharedRandom.Next());
                 }
@@ -112,89 +89,6 @@ public class MessageReadPerformanceTests
 
         Debug.WriteLine($"{count / 4} elements, unchecked float32 element read: {_stopwatch.ElapsedTicks} ticks, last value {value}");
     }
-
-    [Test]
-    public void ReadFloatElement_Checked()
-    {
-        const int count = 2048;
-        var values = FromBytes(_buffers, count, TypeTag.Float32, sizeof(float));
-
-        for (int i = 0; i < count; i++)
-        {
-            Assert.AreEqual(_buffers[i].@float, values.ReadFloatElement(i));
-            Assert.AreEqual((double)_buffers[i].@float, values.ReadFloat64Element(i));
-            Assert.AreEqual((int)_buffers[i].@float, values.ReadIntElement(i));
-            Assert.AreEqual((long)_buffers[i].@float, values.ReadInt64Element(i));
-            Assert.AreEqual(_buffers[i].@float.ToString(), values.ReadStringElement(i));
-        }
-    }
-
-    [Test]
-    public void ReadFloatElement_Unchecked()
-    {
-        const int count = 2048;
-        var values = FromBytes(_buffers, count, TypeTag.Float32, sizeof(float));
-
-        for (int i = 0; i < count; i++)
-        {
-            Assert.AreEqual(_buffers[i].@float, values.ReadFloatElementUnchecked(i));
-        }
-    }
-
-    [Test]
-    public void ReadFloat64Element_Checked()
-    {
-        const int count = 2048;
-        var values = FromBytes(_buffers, count, TypeTag.Float64, sizeof(double));
-
-        for (int i = 0; i < count; i++)
-        {
-            Assert.AreEqual(_buffers[i].@double, values.ReadFloat64Element(i));
-            Assert.AreEqual((long)_buffers[i].@double, values.ReadInt64Element(i));
-            Assert.AreEqual(_buffers[i].@double.ToString(), values.ReadStringElement(i));
-        }
-    }
-
-    [Test]
-    public void ReadFloat64Element_Unchecked()
-    {
-        const int count = 2048;
-        var values = FromBytes(_buffers, count, TypeTag.Float64, sizeof(double));
-
-        for (int i = 0; i < count; i++)
-        {
-            Assert.AreEqual(_buffers[i].@double, values.ReadFloat64ElementUnchecked(i));
-        }
-    }
-
-
-    [Test]
-    public void ReadInt64Element_Checked()
-    {
-        const int count = 2048;
-        var values = FromBytes(_buffers, count, TypeTag.Int64, sizeof(double));
-
-        for (int i = 0; i < count; i++)
-        {
-            Assert.AreEqual(_buffers[i].@long, values.ReadInt64Element(i));
-            Assert.AreEqual((double)_buffers[i].@long, values.ReadFloat64Element(i));
-            Assert.AreEqual(_buffers[i].@long.ToString(), values.ReadStringElement(i));
-        }
-    }
-
-    [Test]
-    public void ReadInt64Element_Unchecked()
-    {
-        const int count = 2048;
-        var values = FromBytes(_buffers, count, TypeTag.Int64, sizeof(double));
-
-        for (int i = 0; i < count; i++)
-        {
-            Assert.AreEqual(_buffers[i].@long, values.ReadInt64ElementUnchecked(i));
-        }
-    }
-
-
 
     [Test]
     public void ReadIntElement_CheckedVsUnchecked()
