@@ -13,7 +13,7 @@ namespace BlobHandles;
 public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
 {
     /// <summary>A pointer to the start of the blob</summary>
-    public byte* Pointer => (byte*)Reference;
+    public byte* Pointer => (byte*)Unsafe.AsPointer(ref Reference);
 
     /// <summary>A reference to the start of the blob</summary>
     public ref byte Reference
@@ -92,7 +92,7 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
 
     public override string ToString()
     {
-        return $"{Length} bytes @ {new IntPtr(Reference)}";
+        return $"{Length} bytes @ {new IntPtr(Pointer)}";
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,8 +130,8 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
 
     private static int MemoryCompare(ref byte ptr1, ref byte ptr2, int count)
     {
-        var p1 = (byte*)ptr1;
-        var p2 = (byte*)ptr2;
+        var p1 = (byte*)Unsafe.AsPointer(ref ptr1);
+        var p2 = (byte*)Unsafe.AsPointer(ref ptr2);
         for (int i = 0; i < (uint)count; i++)
         {
             if (p1[i] != p2[i])
