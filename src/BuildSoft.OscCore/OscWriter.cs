@@ -183,11 +183,7 @@ public sealed unsafe class OscWriter : IDisposable
     /// <summary>Write a MIDI message element</summary>
     public void Write(MidiMessage data)
     {
-        fixed (byte* buffer = &Buffer[_length])
-        {
-            var midiWritePtr = (MidiMessage*)buffer;
-            *midiWritePtr = data;
-        }
+        Unsafe.As<byte, MidiMessage>(ref Buffer[_length]) = data;
         _length += 4;
     }
 
@@ -239,10 +235,7 @@ public sealed unsafe class OscWriter : IDisposable
             Buffer[_length++] = 0;
 
         // write the 4 bytes for the type tags
-        fixed (byte* buffer = &Buffer[_length])
-        {
-            *(uint*)buffer = tags;
-        }
+        Unsafe.As<byte, uint>(ref Buffer[_length]) = tags;
         _length += 4;
     }
 

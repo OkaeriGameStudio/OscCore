@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace BuildSoft.OscCore;
@@ -254,10 +255,7 @@ public unsafe class OscParser
                     break;
                 case TypeTag.Blob:
                     // read the int that specifies the size of the blob
-                    fixed (byte* bytes = &_buffer[offset])
-                    {
-                        offset += 4 + *(int*)bytes;
-                    }
+                    offset += 4 + Unsafe.As<byte, int>(ref _buffer[offset]);
                     break;
             }
         }
@@ -271,10 +269,7 @@ public unsafe class OscParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsBundleTagAtIndex(int index)
     {
-        fixed (byte* buffer = &_buffer[index])
-        {
-            return *(long*)buffer == Constant.BundlePrefixLong;
-        }
+        return Unsafe.As<byte, long>(ref _buffer[index]) == Constant.BundlePrefixLong;
     }
 
     public static int FindArrayLength(byte[] bytes, int offset = 0)
