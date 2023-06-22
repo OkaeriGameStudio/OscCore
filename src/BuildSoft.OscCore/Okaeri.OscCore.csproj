@@ -17,22 +17,36 @@
     <PackageDescription>A performance-oriented OSC library for .NET Standard</PackageDescription>
     <RepositoryUrl>https://github.com/OkaeriGameStudio/OscCore</RepositoryUrl>
     <Company>Okaeri Game Studio</Company>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <RepositoryType>git</RepositoryType>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <DebugType>portable</DebugType>
+    <WarningLevel>6</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <DebugType>portable</DebugType>
+    <WarningLevel>6</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <DebugType>portable</DebugType>
+    <WarningLevel>6</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <DebugType>portable</DebugType>
+    <WarningLevel>6</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>
