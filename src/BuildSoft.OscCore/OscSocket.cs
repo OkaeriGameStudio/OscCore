@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 internal sealed class OscSocket : IDisposable
 {

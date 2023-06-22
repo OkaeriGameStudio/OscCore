@@ -5,10 +5,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using BuildSoft.OscCore.Tests;
+using Okaeri.OscCore.Tests;
 using NUnit.Framework;
 
-namespace BuildSoft.OscCore.Test.Runtime;
+namespace Okaeri.OscCore.Test.Runtime;
 
 [TestOf(typeof(OscServer))]
 public class OscServerTest

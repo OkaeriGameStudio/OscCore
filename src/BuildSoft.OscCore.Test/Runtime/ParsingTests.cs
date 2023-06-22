@@ -5,7 +5,7 @@ using System.Data.SqlTypes;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 
-namespace BuildSoft.OscCore.Tests;
+namespace Okaeri.OscCore.Tests;
 
 public class ParsingTests
 {

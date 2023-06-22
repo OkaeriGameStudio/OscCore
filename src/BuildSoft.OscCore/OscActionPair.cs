@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 /// <summary>
 /// A pair of methods associated with an OSC address

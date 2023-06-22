@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace BuildSoft.OscCore.UnityObjects;
+namespace Okaeri.OscCore.UnityObjects;
 
 public struct Vector2
 {

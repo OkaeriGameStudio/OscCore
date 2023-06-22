@@ -2,10 +2,10 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using BlobHandles;
-using BuildSoft.OscCore.UnityObjects;
+using Okaeri.OscCore.UnityObjects;
 using MiniNtp;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public sealed unsafe class OscWriter : IDisposable
 {

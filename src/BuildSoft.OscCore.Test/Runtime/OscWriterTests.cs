@@ -2,12 +2,12 @@
 using System.Net;
 using System.Text;
 using BlobHandles;
-using BuildSoft.OscCore;
-using BuildSoft.OscCore.UnityObjects;
+using Okaeri.OscCore;
+using Okaeri.OscCore.UnityObjects;
 using MiniNtp;
 using NUnit.Framework;
 
-namespace BuildSoft.OscCore.Tests;
+namespace Okaeri.OscCore.Tests;
 
 public class OscWriterTests
 {

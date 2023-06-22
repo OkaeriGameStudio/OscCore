@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using BuildSoft.OscCore.UnityObjects;
+using Okaeri.OscCore.UnityObjects;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public sealed unsafe partial class OscMessageValues
 {

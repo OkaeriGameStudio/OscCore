@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using BlobHandles;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 internal static class Utils
 {

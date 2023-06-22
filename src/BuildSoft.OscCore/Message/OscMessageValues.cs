@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using BuildSoft.OscCore.UnityObjects;
+using Okaeri.OscCore.UnityObjects;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 /// <summary>
 /// Represents the tags and values associated with a received OSC message

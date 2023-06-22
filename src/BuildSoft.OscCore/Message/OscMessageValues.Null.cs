@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public sealed partial class OscMessageValues
 {

@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace BuildSoft.OscCore.UnityObjects;
+namespace Okaeri.OscCore.UnityObjects;
 
 [StructLayout(LayoutKind.Explicit)]
 

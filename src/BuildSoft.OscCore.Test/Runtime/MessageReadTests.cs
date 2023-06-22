@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Linq;
-using BuildSoft.OscCore.UnityObjects;
+using Okaeri.OscCore.UnityObjects;
 using NUnit.Framework;
 
-namespace BuildSoft.OscCore.Tests;
+namespace Okaeri.OscCore.Tests;
 
 [TestOf(typeof(OscMessageValues))]
 public class MessageReadTests

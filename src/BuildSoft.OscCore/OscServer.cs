@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using BlobHandles;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public sealed unsafe class OscServer : IDisposable
 {

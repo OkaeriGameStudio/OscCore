@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 internal static class Constant
 {

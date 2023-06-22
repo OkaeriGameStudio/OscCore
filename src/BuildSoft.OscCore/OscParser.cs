@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public unsafe class OscParser
 {

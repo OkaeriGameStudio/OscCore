@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 [StructLayout(LayoutKind.Explicit)]
 public struct MidiMessage : IEquatable<MidiMessage>

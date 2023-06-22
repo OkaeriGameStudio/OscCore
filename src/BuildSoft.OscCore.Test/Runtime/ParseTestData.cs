@@ -5,7 +5,7 @@ using System.Text;
 using MiniNtp;
 using NUnit.Framework;
 
-namespace BuildSoft.OscCore.Tests;
+namespace Okaeri.OscCore.Tests;
 
 internal static class MessageTestData
 {

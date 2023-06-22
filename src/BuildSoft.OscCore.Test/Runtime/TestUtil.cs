@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BuildSoft.OscCore.Tests;
+namespace Okaeri.OscCore.Tests;
 
 public static class TestUtil
 {

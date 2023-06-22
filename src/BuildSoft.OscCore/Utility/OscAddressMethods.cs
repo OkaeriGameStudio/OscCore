@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using BlobHandles;
 using Unity.IL2CPP.CompilerServices.BlobHandles;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 /// <summary>Maps from OSC address to the delegates associated with it</summary>
 internal sealed unsafe class OscAddressMethods : IDisposable

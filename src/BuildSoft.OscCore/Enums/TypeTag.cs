@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 /// <summary>
 /// type tags from http://opensoundcontrol.org/spec-1_0 

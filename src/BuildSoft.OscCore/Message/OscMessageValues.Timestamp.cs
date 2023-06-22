@@ -1,6 +1,6 @@
 ﻿using MiniNtp;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public sealed unsafe partial class OscMessageValues
 {

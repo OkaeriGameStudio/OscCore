@@ -1,5 +1,5 @@
 ﻿using BlobHandles;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public delegate void MonitorCallback(BlobString address, OscMessageValues values);

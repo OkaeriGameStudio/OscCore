@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using BuildSoft.OscCore.UnityObjects;
+using Okaeri.OscCore.UnityObjects;
 
-namespace BuildSoft.OscCore.Tests;
+namespace Okaeri.OscCore.Tests;
 
 [StructLayout(LayoutKind.Explicit)]
 public unsafe struct ConvertBuffer

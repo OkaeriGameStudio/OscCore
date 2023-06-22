@@ -2,9 +2,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using BuildSoft.OscCore.UnityObjects;
+using Okaeri.OscCore.UnityObjects;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public class OscClient : IDisposable
 {

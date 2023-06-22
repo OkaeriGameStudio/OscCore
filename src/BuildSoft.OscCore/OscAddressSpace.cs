@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace BuildSoft.OscCore;
+namespace Okaeri.OscCore;
 
 public sealed class OscAddressSpace
 {

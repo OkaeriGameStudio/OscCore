@@ -1,4 +1,4 @@
-﻿namespace BuildSoft.OscCore;
+﻿namespace Okaeri.OscCore;
 
 internal enum Vector3ElementFilter : byte
 {
