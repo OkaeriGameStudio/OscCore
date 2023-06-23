@@ -204,14 +204,14 @@ public class OscClient : IDisposable
         return bytes;
     }
 
-    private bool _isDisporsed = false;
+    private bool _isDisposed = false;
     public void Dispose()
     {
-        if (!_isDisporsed)
+        if (!_isDisposed)
         {
             Socket.Dispose();
             Writer.Dispose();
-            _isDisporsed = true;
+            _isDisposed = true;
         }
     }
 }

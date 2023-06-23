@@ -799,9 +799,3 @@
         </member>
     </members>
 </doc>
-name="M:MiniNtp.NtpTimestamp.ToBigEndianBytes(System.UInt32*)">
-            <summary>Convert to big-endian byte order</summary>
-            <param name="writePtr">The pointer to start writing at</param>
-        </member>
-    </members>
-</doc>

@@ -83,7 +83,8 @@ public sealed unsafe class OscServer : IDisposable
         if (PortToServer.TryGetValue(port, out var server))
         {
             server.Dispose();
-            return PortToServer.Remove(port);
+            PortToServer.Remove(port);
+            return true;
         }
         return false;
     }
