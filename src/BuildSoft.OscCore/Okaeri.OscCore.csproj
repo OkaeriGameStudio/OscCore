@@ -21,7 +21,7 @@
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <RepositoryType>git</RepositoryType>
-    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <AnalysisLevel>latest</AnalysisLevel>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
