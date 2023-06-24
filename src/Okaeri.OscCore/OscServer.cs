@@ -224,11 +224,11 @@ public sealed unsafe class OscServer : IDisposable
                 }
 
                 // Forward Enabled
-                if (_forwarding)
-                {
-                    //string address = Encoding.ASCII.GetString(bufferPtr, addressLength);
-                    HandleForwarderCallbacks(bufferPtr, addressLength, parser);
-                }
+                //if (_forwarding)
+                //{
+                //    //string address = Encoding.ASCII.GetString(bufferPtr, addressLength);
+                //    HandleForwarderCallbacks(bufferPtr, addressLength, parser);
+                //}
 
                 if (_monitorCallbacks.Count > 0)
                     HandleMonitorCallbacks(bufferPtr, addressLength, parser);
@@ -303,12 +303,12 @@ public sealed unsafe class OscServer : IDisposable
             _mainThreadQueue.Enqueue(pair.MainThreadQueued);
     }
 
-    private void HandleForwarderCallbacks(byte* bufferPtr, int addressLength, OscParser parser)
-    {
-        // handle forwarder callbacks
-        var forwarderAddressStr = new BlobString(bufferPtr, addressLength);
-        OscForwarder.ForwardingQueue.Enqueue((forwarderAddressStr, parser.MessageValues));
-    }
+    //private void HandleForwarderCallbacks(byte* bufferPtr, int addressLength, OscParser parser)
+    //{
+    //    // handle forwarder callbacks
+    //    var forwarderAddressStr = new BlobString(bufferPtr, addressLength);
+    //    //OscForwarder.ForwardingQueue.Enqueue((forwarderAddressStr, parser.MessageValues));
+    //}
 
     private void HandleMonitorCallbacks(byte* bufferPtr, int addressLength, OscParser parser)
     {
