@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace BlobHandles;
 
@@ -21,9 +17,8 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
         get
         {
             if (_pointer != null)
-            {
                 return ref *_pointer;
-            }
+
             return ref _bytes[_offset];
         }
     }
@@ -44,6 +39,8 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
         }
     }
 
+    #pragma warning disable CS8618
+
     public BlobHandle(byte* pointer, int length)
     {
         _pointer = pointer;
@@ -55,6 +52,8 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
         _pointer = (byte*)pointer;
         Length = length;
     }
+
+    #pragma warning restore CS8618
 
     /// <summary>
     /// Get a blob handle for a byte array. The byte array should have its address pinned to work safely!
@@ -135,9 +134,7 @@ public readonly unsafe struct BlobHandle : IEquatable<BlobHandle>
         for (int i = 0; i < (uint)count; i++)
         {
             if (p1[i] != p2[i])
-            {
                 return 1;
-            }
         }
         return 0;
     }

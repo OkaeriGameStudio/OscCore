@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Okaeri.OscCore.UnityObjects;
@@ -21,7 +20,7 @@ public class OscClient : IDisposable
 
     public OscClient(string ipAddress, int port)
     {
-        Writer = new OscWriter();
+        Writer = new();
 
         Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         if (ipAddress == "255.255.255.255")
@@ -213,5 +212,7 @@ public class OscClient : IDisposable
             Writer.Dispose();
             _isDisposed = true;
         }
+
+        GC.SuppressFinalize(this);
     }
 }

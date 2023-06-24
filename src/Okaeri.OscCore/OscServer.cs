@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
 using System.Text;
 using BlobHandles;
 
@@ -19,6 +16,9 @@ public sealed unsafe class OscServer : IDisposable
     private readonly List<MonitorCallback> _monitorCallbacks = new();
     private readonly List<OscActionPair> _patternMatchedMethods = new();
 
+    private static bool _forwarding = false;
+    private static int _fwPort = 9002;
+
     internal bool Running { get; set; }
 
     /// <summary>
@@ -33,9 +33,7 @@ public sealed unsafe class OscServer : IDisposable
     public OscServer(int port, int bufferSize = 4096)
     {
         if (PortToServer.ContainsKey(port))
-        {
             throw new ArgumentException($"port {port} is already in use, cannot start a new OSC Server on it", nameof(port));
-        }
 
         _singleCallbackToPair.Clear();
         AddressSpace = new OscAddressSpace();
@@ -63,15 +61,21 @@ public sealed unsafe class OscServer : IDisposable
     /// <summary>
     /// Get an existing OSC server on the given port, or create one if it doesn't exist.
     /// </summary>
-    /// <param name="port">The port to listen for incoming message on</param>
+    /// <param name="port">The port to listen for incoming messages on</param>
+    /// <param name="forward">Whether or not we are enabling forwarding</param>
+    /// <param name="fwport">The port to forward messages to</param>
     /// <returns></returns>
-    public static OscServer GetOrCreate(int port)
+    public static OscServer GetOrCreate(int port, bool forward = false, int fwport = 9002)
     {
         if (!PortToServer.TryGetValue(port, out var server))
         {
             server = new OscServer(port);
             PortToServer[port] = server;
         }
+
+        _forwarding = forward;
+        _fwPort = fwport;
+
         return server;
     }
 
@@ -115,10 +119,7 @@ public sealed unsafe class OscServer : IDisposable
     public bool RemoveMethod(string address, Action<OscMessageValues> valueReadMethod)
     {
         if (_singleCallbackToPair.TryGetValue(valueReadMethod, out var pair))
-        {
-            return AddressSpace.RemoveMethod(address, pair) &&
-                    _singleCallbackToPair.Remove(valueReadMethod);
-        }
+            return AddressSpace.RemoveMethod(address, pair) && _singleCallbackToPair.Remove(valueReadMethod);
 
         return false;
     }
@@ -222,6 +223,13 @@ public sealed unsafe class OscServer : IDisposable
                     TryMatchPatterns(parser, bufferPtr, addressLength);
                 }
 
+                // Forward Enabled
+                if (_forwarding)
+                {
+                    //string address = Encoding.ASCII.GetString(bufferPtr, addressLength);
+                    HandleForwarderCallbacks(bufferPtr, addressLength, parser);
+                }
+
                 if (_monitorCallbacks.Count > 0)
                     HandleMonitorCallbacks(bufferPtr, addressLength, parser);
 
@@ -292,9 +300,14 @@ public sealed unsafe class OscServer : IDisposable
 
         // if there's a main thread method, queue it
         if (pair.MainThreadQueued != null)
-        {
             _mainThreadQueue.Enqueue(pair.MainThreadQueued);
-        }
+    }
+
+    private void HandleForwarderCallbacks(byte* bufferPtr, int addressLength, OscParser parser)
+    {
+        // handle forwarder callbacks
+        var forwarderAddressStr = new BlobString(bufferPtr, addressLength);
+        OscForwarder.ForwardingQueue.Enqueue((forwarderAddressStr, parser.MessageValues));
     }
 
     private void HandleMonitorCallbacks(byte* bufferPtr, int addressLength, OscParser parser)
@@ -329,9 +342,7 @@ public sealed unsafe class OscServer : IDisposable
             {
                 valueRead(parser.MessageValues);
                 if (mainThreadQueued != null)
-                {
                     _mainThreadQueue.Enqueue(mainThreadQueued);
-                }
             }
         }
     }
@@ -355,6 +366,8 @@ public sealed unsafe class OscServer : IDisposable
 
         AddressSpace._addressToMethod.Dispose();
         _socket.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     ~OscServer()

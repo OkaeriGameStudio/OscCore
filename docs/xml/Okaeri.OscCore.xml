@@ -753,6 +753,12 @@
         </member>
         <member name="T:Unity.IL2CPP.CompilerServices.BlobHandles.Il2CppSetOptionAttribute">
              <summary>
+             Us
+             exception, so it is probably safe to leave it disabled.
+             </summary>
+        </member>
+        <member name="T:Unity.IL2CPP.CompilerServices.BlobHandles.Il2CppSetOptionAttribute">
+             <summary>
              Use this attribute on a class, method, or property to inform the IL2CPP code conversion utility to override the
              global setting for one of a few different runtime checks.
             

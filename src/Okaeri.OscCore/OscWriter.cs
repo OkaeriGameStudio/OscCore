@@ -246,6 +246,6 @@ public sealed unsafe class OscWriter : IDisposable
 
     public void Dispose()
     {
-
+        GC.SuppressFinalize(this);
     }
 }
